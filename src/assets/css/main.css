@@ -1,0 +1,120 @@
+@import url(./component/image.css);
+@import url(./component/icon.css);
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+:root {
+  --sidebar-width-show: 230px;
+  --sidebar-width-hide: calc(16px + 16px + 36px + 2 * 10px);
+
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --primary-color: #1aa4c8;
+  --border-radius-size: 4px;
+  --header-height: 60px;
+  --padding-main-content: 24px;
+
+  --url-image: url('../icon/qlts-icon.png');
+
+  --nav-link-active-color: #1aa4c8;
+  --nav-link-hover-color: #42424203;
+
+  --main-color-default: #1aa4c8;
+  --main-color-hover: #0582a2;
+  --main-color-active: #28b7dc;
+  --main-color-focus: #1aa4c8;
+  --main-color-disabled: #8cd1e3;
+
+  --sub-color-default: #ffffff;
+  --sub-color-hover: #d1edf4;
+  --sub-color-active: #ffffff;
+  --sub-color-focus: #ffffff;
+  --sub-color-disabled: #ffffff;
+
+  --outline-color-default: #ffffff;
+  --outline-color-hover: #1aa4c8;
+  --outline-color-active: #1aa4c8;
+  --outline-color-focus: #1aa4c8;
+  --outline-color-disabled: #f7f7f7;
+
+  --outline-active: #5ebfd9;
+  --textfield-height: 36px;
+  --color-error: #f44336;
+  --scroll-bar-color: #abb6c8;
+  --scroll-bar-bg-color: #d1dae9;
+  --textfield-disabled-color: #f5f5f5;
+  --textfield-border-color: #ccc;
+
+  --color-item-selected: #d1edf4;
+
+  --loading-grey: #f2ecec;
+
+  /* z-index order */
+  --z-index-table: 5;
+  --z-index-header-table: 10;
+  --z-index-footer-table: 10;
+
+  --z-index-context-menu: 1005;
+
+  --z-index-snackbar: 2000;
+
+  --z-index-loading: 40;
+
+  --z-index-popup: 20;
+  --z-index-snackbar: 30;
+
+  --z-index-layout: 50;
+  --z-index-form: 155;
+}
+body {
+  font-family: 'MISA font', sans-serif, Arial, Helvetica;
+  font-size: 14px;
+  color: var(--color-black);
+  background-color: #e6f2ff;
+}
+
+#app {
+  width: 100vw;
+  height: 100vh;
+  margin: 0 auto;
+}
+
+button,
+input {
+  outline: none;
+}
+
+@font-face {
+  font-family: 'MISA font';
+  src: url(../fonts/Roboto/Roboto-Regular.ttf);
+}
+
+::-webkit-scrollbar-corner {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+/* * {
+  scrollbar-width: auto;
+  scrollbar-color: var(--scroll-bar-color) var(--scroll-bar-bg-color);
+} */
+
+/* Works on Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--scroll-bar-bg-color);
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--scroll-bar-color);
+  border-radius: 20px;
+  /* border: 3px solid var(--scroll-bar-bg-color); */
+}

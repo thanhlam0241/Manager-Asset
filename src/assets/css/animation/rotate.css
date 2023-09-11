@@ -1,0 +1,9 @@
+#left:checked + #right + section legend {
+  transform: rotate(-180deg) translateX(0.25em);
+  transition: 0.6s ease;
+}
+
+#right:checked + section legend {
+  transform: rotate(0deg) translateY(-0.15em);
+  transition: 0.6s ease;
+}
