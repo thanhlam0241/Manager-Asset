@@ -12,6 +12,16 @@ export const routePage = {
         'ASSET': {
             'NAV': 'Tài sản',
             'HEADER': 'Danh sách tài sản',
+            'CHILDREN': {
+                'WRITE_INCREASE': 'Ghi tăng',
+                'CHANGE_INFO': 'Thay đổi thông tin',
+                'RE_REVIEW': 'Kiểm kê',
+                'COUNT_DEPRECIATION': 'Tính hao mòn',
+                'CONTROL_CHANGE_ASSETS': 'Kiểm soát thay đổi',
+                'WRITE_DECREASE': 'Ghi giảm',
+                'CHECK': 'Kiểm kê',
+                'OTHER': 'Khác',
+            }
         },
         'ASSET_HTDB': {
             'NAV': 'Tài sản HT - ĐB',

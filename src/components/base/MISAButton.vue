@@ -49,9 +49,17 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
+  backgroundColor: {
+    type: String,
+    required: false
+  },
   circle: {
     type: Boolean,
     default: false
+  },
+  style: {
+    type: Object,
+    default: () => ({})
   }
 })
 
@@ -77,6 +85,10 @@ const width = computed(() => {
  */
 const height = computed(() => {
   return props.height
+})
+
+const backgroundColor = computed(() => {
+  return props.backgroundColor
 })
 
 /**
@@ -118,9 +130,11 @@ const vFocus = {
   <button
     v-focus
     ref="btnRef"
+    :style="props.style"
     :class="[
       btnClass[props.type],
       { transparent: props.transparent },
+      { 'color-blue': props.backgroundColor },
       { shadow: props.shadow },
       { 'padding-high': props.padding },
       { circle: props.circle }
@@ -136,6 +150,10 @@ button {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  width: v-bind(width);
+}
+button.color-blue {
+  background-color: v-bind(backgroundColor) !important;
 }
 .circle {
   border-radius: 50% !important;

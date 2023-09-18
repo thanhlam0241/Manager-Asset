@@ -34,7 +34,7 @@ const props = defineProps({
     type: String,
     default: 'string',
     validate: (type) => {
-      return ['string', 'number', 'email', 'date', 'float'].includes(type)
+      return ['string', 'number', 'email', 'date', 'float', 'password'].includes(type)
     }
   },
   placeholder: {

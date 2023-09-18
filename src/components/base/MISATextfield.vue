@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 /**
  * Props của textfield
@@ -29,7 +29,7 @@ const props = defineProps({
     type: String,
     default: 'text',
     validate: (type) => {
-      return ['text', 'number', 'email', 'date'].includes(type)
+      return ['text', 'number', 'email', 'date', 'password'].includes(type)
     }
   },
   width: {
@@ -60,6 +60,10 @@ const props = defineProps({
     type: Number,
     default: 100
   },
+  height: {
+    type: String,
+    default: '36px'
+  },
   onlyInput: {
     type: Boolean,
     default: false
@@ -79,6 +83,10 @@ const error = ref(false)
  * Created by: NTLam (20/07/2023)
  */
 const refInput = ref(null)
+
+const height = computed(() => {
+  return props.height
+})
 
 /**
  * Giá trị của textfield
@@ -182,24 +190,41 @@ watch(inputValue, (newValue) => {
 const onFocus = () => {
   refInput.value.select()
 }
+
+const typeInput = ref(props.type)
+
+const toggle = () => {
+  if (typeInput.value !== 'password') {
+    typeInput.value = 'password'
+  } else {
+    typeInput.value = 'text'
+  }
+}
 </script>
 
 <template>
   <label>
     <span v-if="props.label" :class="{ required: required }">{{ props.label }}</span>
-    <input
-      ref="refInput"
-      @keydown="onKeyDown"
-      :maxlength="props.maxlength"
-      v-focus
-      @focus="onFocus"
-      :class="{ error: error }"
-      :type="props.type"
-      @blur="onBlur"
-      :disabled="props.disabled"
-      :placeholder="props.placeholder"
-      v-model="inputValue"
-    />
+    <div class="input-container">
+      <input
+        ref="refInput"
+        @keydown="onKeyDown"
+        :maxlength="props.maxlength"
+        v-focus
+        @focus="onFocus"
+        :class="{ error: error }"
+        :type="typeInput"
+        @blur="onBlur"
+        :disabled="props.disabled"
+        :placeholder="props.placeholder"
+        v-model="inputValue"
+      />
+      <i
+        @click="toggle"
+        v-if="props.type === 'password'"
+        :class="[!(typeInput === 'password') ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye']"
+      ></i>
+    </div>
     <span v-if="props.label" :class="['text-error', { show: error }]">{{
       props.errorText || 'Không được để trống'
     }}</span>
@@ -212,7 +237,9 @@ label {
   flex-direction: column;
   font-weight: 500;
 }
-
+.input-container {
+  position: relative;
+}
 input:disabled {
   background-color: var(--textfield-disabled-color);
   border-color: #bdbdbd;
@@ -223,7 +250,7 @@ input {
   height: var(--textfield-height);
   display: block;
   width: 100%;
-  height: 36px;
+  height: v-bind(height);
   border-radius: var(--border-radius-size);
   border: 1px solid var(--textfield-border-color);
   margin-top: 8px;
@@ -276,7 +303,18 @@ input.error {
 }
 ::placeholder {
   color: #bdbdbd;
-  font-style: italic;
   font-weight: 500;
+}
+.input-container {
+  position: relative;
+}
+i {
+  /* display: flex;
+  align-items: center;
+  justify-content: center; */
+  cursor: pointer;
+  position: absolute;
+  right: 10px;
+  top: 21px;
 }
 </style>

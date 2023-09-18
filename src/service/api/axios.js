@@ -64,30 +64,47 @@ instance.interceptors.response.use((response) => {
             case 400:
                 // Handle Bad Request here
                 // Display an alert
-                sendEmitted(types.ERROR, error.response.data.UserMessage || exceptionResource[lang].BAD_REQUEST)
+                if (typeof error.response.data === dataTypes.STRING)
+                    sendEmitted(typeAction.ERROR, error.response.data)
+                else
+                    sendEmitted(types.ERROR, error.response.data.UserMessage || exceptionResource[lang].BAD_REQUEST)
                 break;
             case 401:
                 // Handle Unauthorized calls here
-                // Display an alert
-                sendEmitted(types.ERROR, error.response.data.UserMessage || exceptionResource[lang].UNAUTHORIZED)
+                // Display an alert if (typeof error.response.data === dataTypes.STRING)
+                if (typeof error.response.data === dataTypes.STRING) {
+                    sendEmitted(typeAction.INFO, error.response.data || 'Vui lòng đăng nhập lại.')
+                }
+                else
+                    sendEmitted(types.ERROR, error.response.data.UserMessage || exceptionResource[lang].UNAUTHORIZED)
                 break;
             case 404:
                 // Handle 404 here
                 // redirect
-                sendEmitted(types.ERROR, error.response.data.UserMessage || exceptionResource[lang].NOT_FOUND)
+                if (typeof error.response.data === dataTypes.STRING)
+                    sendEmitted(typeAction.ERROR, error.response.data)
+                else
+                    sendEmitted(types.ERROR, error.response.data.UserMessage || exceptionResource[lang].NOT_FOUND)
                 break;
             case 409:
                 // Handle 409 here
                 // redirect
-                sendEmitted(types.ERROR, error.response.data.UserMessage || exceptionResource[lang].CONFLICT)
+                if (typeof error.response.data === dataTypes.STRING)
+                    sendEmitted(typeAction.ERROR, error.response.data)
+                else
+                    sendEmitted(types.ERROR, error.response.data.UserMessage || exceptionResource[lang].CONFLICT)
                 break;
-            case 500:
+            default:
                 // Handle 500 here
                 // redirect
-                sendEmitted(types.ERROR, error.response.data.UserMessage || exceptionResource[lang].INTERNAL_SERVER_ERROR)
+                if (typeof error.response.data === dataTypes.STRING)
+                    sendEmitted(typeAction.ERROR, error.response.data)
+                else
+                    sendEmitted(types.ERROR, error.response.data.UserMessage || exceptionResource[lang].INTERNAL_SERVER_ERROR)
                 break;
             // and so on..
         }
+        return Promise.reject(error.response);
     }
 });
 

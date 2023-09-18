@@ -4,7 +4,10 @@ import { language } from '@/assets/resources/common'
 const store = createStore({
     state() {
         return {
-            lang: language['VI']
+            lang: language['VI'],
+            auth: {
+                isLogin: false
+            }
         }
     },
     mutations: {

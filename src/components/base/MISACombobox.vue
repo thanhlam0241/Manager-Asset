@@ -302,10 +302,10 @@ watch(inputValue, async () => {
 /**
  * Computed property that returns the z-index value for the MISACombobox component.
  * @returns {number} The z-index value.
- * Created by: NTLam (2021-07-05).
+ * Created by: NTLam (2023-07-05).
  */
 const zIndex = computed(() => {
-  return parseInt(props.zIndex)
+  return props.zIndex
 })
 
 /**
@@ -313,7 +313,7 @@ const zIndex = computed(() => {
  * @computed width
  * @memberof MISACombobox
  * @returns {number} The width of the component.
- * Created by: NTLam (2021-07-05).
+ * Created by: NTLam (2023-07-05).
  */
 const width = computed(() => {
   return props.width
@@ -324,7 +324,7 @@ const width = computed(() => {
  * @computed height
  * @memberof MISACombobox
  * @returns {number} The height of the component.
- * Created by: NTLam (2021-07-05).
+ * Created by: NTLam (2023-07-05).
  */
 const height = computed(() => {
   return props.height
@@ -588,8 +588,8 @@ const vClickOutside = {
   align-items: center;
   flex-direction: space-between;
   z-index: v-bind(zIndex);
+  height: v-bind(height);
   background-color: var(--color-white);
-  height: 36px;
   transition: all ease 400ms;
   cursor: pointer;
 }
@@ -607,7 +607,7 @@ label {
   height: 36px;
 }
 .large-size {
-  height: 42px;
+  height: 40px;
 }
 .icon__input {
   height: 36px;
@@ -683,7 +683,7 @@ label {
   background-color: var(--white-color);
   display: flex;
   align-items: center;
-  padding-left: 8px;
+  padding-left: 16px;
   justify-content: space-between;
   font-size: 14px;
   z-index: 10;
