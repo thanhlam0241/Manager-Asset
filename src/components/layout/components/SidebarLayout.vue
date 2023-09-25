@@ -1,17 +1,6 @@
 <script setup>
-// Router
-import { RouterLink } from 'vue-router'
-// Resources
-import { routePage } from '@/assets/resources/common.js'
-//store vuex
-import { useStore } from 'vuex'
-import { computed } from 'vue'
-
-const store = useStore()
-
-const lang = computed(() => store.state.lang)
-
-console.log(lang.value)
+import MISASidebarLink from '@/components/base/MISASidebarLink.vue'
+import sidebarRoutes from '@/helper/routes.js'
 
 defineProps({
   sidebarShow: Boolean
@@ -19,88 +8,63 @@ defineProps({
 </script>
 
 <template>
-  <nav :class="['nav__sidebar', sidebarShow ? 'show' : 'hide']">
-    <div class="nav__header">
-      <i class="image-app"></i>
-      <h1 v-if="sidebarShow">MISA QLTS</h1>
-    </div>
-    <div class="div__router">
-      <RouterLink exact-active-class="active" class="nav__router-link" to="/">
-        <i class="image-computer-fluctuate-outline"></i>
-        <div v-if="sidebarShow" class="route__content link__collapse">
-          {{ routePage[lang]['OUTLINE']['NAV'] }}
-          <i class="icon-angle-down-white"></i>
-        </div>
-      </RouterLink>
-      <RouterLink exact-active-class="active" class="nav__router-link" to="/assets">
-        <i class="image-asset-varient"></i>
-        <div v-if="sidebarShow" class="route__content link__collapse">
-          {{ routePage[lang]['ASSET']['NAV'] }}
-          <i class="icon-angle-down-white"></i>
-        </div>
-      </RouterLink>
-      <RouterLink exact-active-class="active" class="nav__router-link" to="/excel">
-        <i class="image-asset-outline"></i>
-        <div v-if="sidebarShow" class="route__content link__collapse">
-          {{ routePage[lang]['ASSET_HTDB']['NAV'] }}
-          <i class="icon-angle-down-white"></i>
-        </div>
-      </RouterLink>
-      <RouterLink exact-active-class="active" class="nav__router-link" to="/">
-        <i class="image-tool-outline"></i>
-        <div v-if="sidebarShow" class="route__content link__collapse">
-          {{ routePage[lang]['TOOL']['NAV'] }}
-          <i class="icon-angle-down-white"></i>
-        </div>
-      </RouterLink>
-      <RouterLink exact-active-class="active" class="nav__router-link" to="/">
-        <i class="image-catalog-outline"></i>
-        <div v-if="sidebarShow" class="route__content link__collapse">
-          {{ routePage[lang]['CATALOG']['NAV'] }}
-          <i class="icon-angle-down-white"></i>
-        </div>
-      </RouterLink>
-      <RouterLink exact-active-class="active" class="nav__router-link" to="/">
-        <i class="image-discover-outline"></i>
-        <div v-if="sidebarShow" class="route__content link__collapse">
-          {{ routePage[lang]['SEARCH']['NAV'] }}
-          <i class="icon-angle-down-white"></i>
-        </div>
-      </RouterLink>
-      <RouterLink exact-active-class="active" class="nav__router-link" to="/">
-        <i class="image-report-outline"></i>
-        <div v-if="sidebarShow" class="route__content link__collapse">
-          {{ routePage[lang]['REPORT']['NAV'] }}
-          <i class="icon-angle-down-white"></i>
-        </div>
-      </RouterLink>
-      <div class="nav_footer" :class="sidebarShow ? 'show' : 'hide'">
-        <i
-          :class="[
-            sidebarShow ? 'icon-square-left-arrow' : 'icon-square-right-arrow',
-            'icon__interactive'
-          ]"
-          @click="$emit('toggle')"
-        ></i>
+  <div class="sidebar">
+    <nav :class="['nav__sidebar', sidebarShow ? 'show' : 'hide']">
+      <div class="nav__header">
+        <i class="image-app"></i>
+        <h1 v-if="sidebarShow">MISA QLTS</h1>
       </div>
+      <div class="div__router">
+        <MISASidebarLink
+          v-for="route in sidebarRoutes"
+          :key="route.name"
+          :route="route"
+          :show="sidebarShow"
+        />
+      </div>
+    </nav>
+
+    <div class="nav_footer" :class="sidebarShow ? 'show' : 'hide'">
+      <i
+        :class="[
+          sidebarShow ? 'icon-square-left-arrow' : 'icon-square-right-arrow',
+          'icon__interactive'
+        ]"
+        @click="$emit('toggle')"
+      ></i>
     </div>
-  </nav>
+  </div>
 </template>
 
 <style scoped>
-.nav__sidebar {
+.space {
+  height: 50px;
+}
+.sidebar {
   height: 100vh;
-  background-color: #001833;
   position: fixed;
   top: 0;
   left: 0;
+  background-color: #001833;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  z-index: var(--z-index-layout);
+  padding-bottom: 15px;
+}
+.nav__sidebar {
   display: flex;
   flex-direction: column;
   align-items: stretch;
+  position: relative;
   padding: 12px 20px;
   gap: 36px;
+  flex-grow: 1;
   /* transition: all 0.5s ease; */
-  z-index: var(--z-index-layout);
+  overflow-y: auto;
+}
+.nav__sidebar::-webkit-scrollbar {
+  width: 0px;
 }
 .nav__router-link.active {
   background: var(--nav-link-active-color);
@@ -151,6 +115,7 @@ h1 {
   height: 40px;
   justify-content: space-between;
   padding: 0 6px;
+  position: sticky;
   /* transition: all 0.5s ease; */
 }
 
@@ -176,9 +141,7 @@ h1 {
 }
 
 .nav_footer {
-  position: absolute;
-  bottom: 0;
-  left: -20px;
+  margin-top: 10px;
   display: flex;
   justify-content: flex-end;
   align-items: center;

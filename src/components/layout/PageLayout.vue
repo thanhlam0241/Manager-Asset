@@ -19,14 +19,16 @@ const toggleSidebar = () => {
   <main :class="['main__container', sidebarShow ? 'show' : 'hidden']">
     <SidebarLayout @toggle="toggleSidebar" :sidebar-show="sidebarShow" />
     <HeaderLayout :sidebar-show="sidebarShow" />
-    <router-view></router-view>
+    <div class="content">
+      <router-view></router-view>
+    </div>
   </main>
 </template>
 
 <style scoped>
 .main__container {
   width: 100%;
-  height: 100%;
+  height: 100vh;
   padding-right: var(--padding-main-content);
   padding-bottom: calc(var(--padding-main-content) - 4px);
   padding-top: calc(var(--header-height) + var(--padding-main-content) - 17px);
@@ -38,5 +40,9 @@ const toggleSidebar = () => {
 
 .main__container.hidden {
   padding-left: calc(var(--sidebar-width-hide) + var(--padding-main-content));
+}
+.content {
+  width: 100%;
+  height: 100%;
 }
 </style>

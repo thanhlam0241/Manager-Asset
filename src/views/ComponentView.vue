@@ -8,15 +8,11 @@ import MISACheckbox from '@/components/base/MISACheckbox.vue'
 import MISATooltip from '@/components/base/MISATooltip.vue'
 import MISASearchBoxVue from '../components/base/MISASearchBox.vue'
 import MISAInput from '../components/base/MISAInput.vue'
-import MISADialog from '../components/base/MISADialog.vue'
 import MISASkeleton from '../components/base/MISASkeleton.vue'
 import MISALoading from '../components/base/MISALoading.vue'
-import send1000PostRequest from '@/service/api/testData'
-import { ref } from 'vue'
-const open = ref(false)
-const togglePopup = () => {
-  open.value = !open.value
-}
+// import sendPostRequest from '@/service/api/testData'
+
+// sendPostRequest(100)
 </script>
 
 <template>
@@ -26,7 +22,7 @@ const togglePopup = () => {
       <MISAButton type="main" disabled>Btn main</MISAButton>
     </div>
     <div class="div-flex">
-      <MISAButton @click="send1000PostRequest" type="sub">Btn sub</MISAButton>
+      <MISAButton type="sub">Btn sub</MISAButton>
       <MISAButton type="sub" disabled>Btn sub</MISAButton>
     </div>
     <div class="div-flex">

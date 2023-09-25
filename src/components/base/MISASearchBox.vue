@@ -22,6 +22,10 @@ const props = defineProps({
   value: {
     type: String,
     default: ''
+  },
+  style: {
+    type: Object,
+    default: () => ({})
   }
 })
 
@@ -60,7 +64,7 @@ watch(
 </script>
 
 <template>
-  <div :class="['searchbox', { disabled: disabled }]">
+  <div :style="{ ...props.style }" :class="['searchbox', { disabled: disabled }]">
     <button class="btn-find"><i class="icon-find"></i></button>
     <input v-model="inputValue" class="searchbox__input" type="text" :placeholder="placeholder" />
   </div>

@@ -1,6 +1,6 @@
 const sidebarRoutes = [
     {
-        path: '/',
+        path: '/overview',
         name: 'OUTLINE',
         icon: 'image-computer-fluctuate-outline',
         collapse: false,

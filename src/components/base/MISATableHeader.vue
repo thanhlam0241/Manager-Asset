@@ -130,6 +130,7 @@ onUnmounted(() => {
         v-for="column in props.columns"
         :key="column.id"
         :class="[{ data__number: column.type === 'number' }]"
+        :width="column.width ? column.width : 'auto'"
       >
         <span class="th_text" v-if="!column.tooltip">{{ column.label }}</span>
         <MISATooltip position="bottom" :text="column.tooltip" v-else>

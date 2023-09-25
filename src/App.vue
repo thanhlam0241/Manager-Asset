@@ -26,7 +26,7 @@ onMounted(() => {
   authenticateApi.checkLogin().then(
     (response) => {
       console.log(response)
-      router.push('/')
+      //router.push('/')
     },
     (error) => {
       console.log(error)

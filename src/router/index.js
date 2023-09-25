@@ -6,6 +6,8 @@ import AuthenticationLayout from '@/components/layout/AuthenticationLayout.vue'
 import ComponentView from '@/views/ComponentView.vue'
 import TableView from '@/views/TableView.vue'
 import MISAExcelEditor from '@/components/base/MISAExcelEditer.vue'
+import NotFound from '@/components/page/NotFound.vue'
+import IncreaseAssetView from '@/views/IncreaseAssetView/IncreaseAssetView.vue'
 
 const router = createRouter({
   // history: createWebHistory(import.meta.env.BASE_URL),
@@ -16,7 +18,7 @@ const router = createRouter({
       component: PageLayout,
       children: [
         {
-          path: '',
+          path: 'overview',
           component: ComponentView
         },
         {
@@ -39,7 +41,9 @@ const router = createRouter({
             const facid = route.query.facid || ''
             return { size, page, search, did, facid }
           }
-        }
+        },
+        { path: 'assets/write-increase', name: 'increase', component: IncreaseAssetView },
+        { path: '/:pathMatch(.*)*', name: 'not-found', component: NotFound },
       ]
     },
     {

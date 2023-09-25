@@ -22,6 +22,10 @@ import MISATextfield from '@/components/base/MISATextfield.vue'
 import MISATooltip from '@/components/base/MISATooltip.vue'
 import MISAFormControl from '@/components/base/MISAFormControl.vue'
 import MISASkeleton from '@/components/base/MISASkeleton.vue'
+import MISASearchBox from '@/components/base/MISASearchBox.vue'
+import MISATableHeader from '@/components/base/MISATableHeader.vue'
+import MISATableBody from '@/components/base/MISATableBody.vue'
+import MISATableFooter from '@/components/base/MISATableFooter.vue'
 
 const app = createApp(App)
 
@@ -40,6 +44,10 @@ app.component('MISATextfield', MISATextfield)
 app.component('MISATooltip', MISATooltip)
 app.component('MISAFormControl', MISAFormControl)
 app.component('MISASkeleton', MISASkeleton)
+app.component('MISASearchBox', MISASearchBox)
+app.component('MISATableHeader', MISATableHeader)
+app.component('MISATableBody', MISATableBody)
+app.component('MISATableFooter', MISATableFooter)
 
 app.use(router)
 

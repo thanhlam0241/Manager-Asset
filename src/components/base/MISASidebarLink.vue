@@ -2,8 +2,8 @@
 // Router
 import { RouterLink } from 'vue-router'
 import useResources from '@/hooks/useResources.js'
-import { ref } from 'vue'
-
+import { computed } from 'vue'
+import router from '@/router'
 const props = defineProps({
   show: {
     type: Boolean,
@@ -17,27 +17,42 @@ const props = defineProps({
 
 const routePage = useResources().routePage
 
-const open = ref(false)
+const heightCollapse = computed(() => {
+  if (props.route.childPath) {
+    return props.route.childPath.length * (48 + 5) + 'px'
+  }
+  return 0
+})
+
+const isActive = computed(() => {
+  const splitPath = router.currentRoute.value.path.split('/')
+  return splitPath[1] === props.route.path.split('/')[1]
+})
 </script>
 
 <template>
-  <div>
-    <RouterLink exact-active-class="active" class="nav__router-link">
+  <div class="nav-container">
+    <RouterLink :class="[{ active: isActive }]" class="nav__router-link" :to="props.route.path">
       <i :class="route.icon"></i>
       <div v-if="props.show" class="route__content link__collapse">
         {{ routePage[props.route.name].NAV }}
         <i v-if="props.route.collapse" class="icon-angle-down-white"></i>
       </div>
     </RouterLink>
-    <div class="div__collapse" :class="[{ hide: open }]" v-if="props.show && props.route.children">
+    <div
+      ref="divCollapse"
+      class="div__collapse"
+      :class="[{ hide: !isActive }]"
+      v-if="props.show && props.route.childPath"
+    >
       <RouterLink
         exact-active-class="active"
         class="link-collapse"
-        v-for="subRoute in props.route.children"
+        v-for="subRoute in props.route.childPath"
         :key="subRoute.name"
-        :to="subRoute.path"
+        :to="route.path + '/' + subRoute.path"
       >
-        {{ routePage[props.route.name].CHILDREN[subRoute.name] }}}
+        {{ routePage[props.route.name].CHILDREN[subRoute.name] }}
       </RouterLink>
     </div>
   </div>
@@ -68,6 +83,11 @@ const open = ref(false)
   border-radius: var(--border-radius-size);
   height: 48px;
 }
+
+.link-collapse:hover {
+  background-color: #3f5065;
+}
+
 .route__content {
   display: flex;
   align-items: center;
@@ -87,11 +107,15 @@ const open = ref(false)
 .div__collapse {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  transition: all 0.5s ease;
+  gap: 5px;
+  transition: height 1s ease-out;
+  background-color: #33455b;
+  border-radius: 4px;
+  overflow: hidden;
+  height: v-bind(heightCollapse);
 }
 .div__collapse.hide {
   height: 0;
-  transition: all 0.5s ease;
+  transition: height 1s ease-out;
 }
 </style>

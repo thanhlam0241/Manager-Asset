@@ -1,6 +1,6 @@
 import axios from './axios'
 
-const API_URL = (route) => `Auth/${route}`
+const API_URL = (route) => `Authentication/${route}`
 
 class AuthenticateApi {
     login(data) {
