@@ -38,6 +38,10 @@ const props = defineProps({
   selectedAll: {
     type: Boolean,
     default: false
+  },
+  showActionText: {
+    type: Boolean,
+    default: true
   }
 })
 
@@ -115,7 +119,7 @@ onUnmounted(() => {
 <template>
   <thead :class="{ sticky: true }">
     <tr>
-      <th class="input__radio">
+      <th v-if="props.hasCheckbox" class="input__radio">
         <MISACheckbox
           :value="props.selectedAll"
           @mousedown.stop.prevent.self="
@@ -129,7 +133,14 @@ onUnmounted(() => {
       <th
         v-for="column in props.columns"
         :key="column.id"
-        :class="[{ data__number: column.type === 'number' }]"
+        :class="[
+          { data__number: column.type === 'number' },
+          { data_date: column.type === 'date' },
+          { data_order: column.type === 'order' },
+          { position_center: column.position === 'center' },
+          { position_left: column.position === 'left' },
+          { position_right: column.position === 'right' }
+        ]"
         :width="column.width ? column.width : 'auto'"
       >
         <span class="th_text" v-if="!column.tooltip">{{ column.label }}</span>
@@ -137,7 +148,9 @@ onUnmounted(() => {
           <span class="th_text"> {{ column.label }}</span>
         </MISATooltip>
       </th>
-      <th v-if="props.action" class="column__function">Chức năng</th>
+      <th v-if="props.action" class="column__function">
+        {{ props.showActionText ? 'Chức năng' : '' }}
+      </th>
     </tr>
   </thead>
 </template>
@@ -188,9 +201,33 @@ th.data__number {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+th.data_date {
+  text-align: center;
+  padding-right: 10px;
+}
+
+th.data_order {
+  width: calc(16px + 16px + 14px);
+  text-align: center;
+}
+
 th.column__function {
   padding: 0 12px;
 }
+
+.position_center {
+  text-align: center !important;
+}
+
+.position_left {
+  text-align: left !important;
+}
+
+.position_right {
+  text-align: right !important;
+}
+
 thead > tr {
   height: 38px;
   width: 100%;

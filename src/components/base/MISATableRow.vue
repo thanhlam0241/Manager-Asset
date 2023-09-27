@@ -26,8 +26,8 @@ const props = defineProps({
     default: 'auto'
   },
   height: {
-    type: String,
-    default: 'auto'
+    type: Number,
+    default: 40
   },
   action: {
     type: Boolean,
@@ -77,14 +77,16 @@ const width = computed(() => {
  * Created by: NTLam (20/07/2023)
  */
 const height = computed(() => {
-  return props.height
+  return props.height + 'px'
 })
 </script>
 
 <template>
   <tr
     ref="rowRef"
+    style="height: 40px"
     :class="[{ selected: props.selected }, { focus: props.focus }, 'table_row']"
+    :height="props.height"
     v-on:dblclick="$emit('doubleClick')"
     @click.ctrl="$emit('ctrlClick')"
     @click.shift="$emit('shiftClick')"
@@ -97,6 +99,8 @@ const height = computed(() => {
 <style>
 tr {
   height: 40px;
+  table-layout: initial;
+  max-height: 40px;
 }
 .table_row {
   height: v-bind(height) !important;

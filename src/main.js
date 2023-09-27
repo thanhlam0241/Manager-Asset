@@ -26,6 +26,8 @@ import MISASearchBox from '@/components/base/MISASearchBox.vue'
 import MISATableHeader from '@/components/base/MISATableHeader.vue'
 import MISATableBody from '@/components/base/MISATableBody.vue'
 import MISATableFooter from '@/components/base/MISATableFooter.vue'
+import MISATableRow from '@/components/base/MISATableRow.vue'
+import MISATableData from '@/components/base/MISATableData.vue'
 
 const app = createApp(App)
 
@@ -48,6 +50,8 @@ app.component('MISASearchBox', MISASearchBox)
 app.component('MISATableHeader', MISATableHeader)
 app.component('MISATableBody', MISATableBody)
 app.component('MISATableFooter', MISATableFooter)
+app.component('MISATableRow', MISATableRow)
+app.component('MISATableData', MISATableData)
 
 app.use(router)
 

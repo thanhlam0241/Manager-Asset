@@ -50,7 +50,19 @@ const typeClass = computed(() => {
 </script>
 
 <template>
-  <td :width="props.width" :class="typeClass">
+  <td
+    :width="props.width"
+    height="40"
+    :class="[
+      typeClass,
+      { data__number: type === 'number' },
+      { data_date: type === 'date' },
+      { data_order: type === 'order' },
+      { position_center: position === 'center' },
+      { position_left: position === 'left' },
+      { position_right: position === 'right' }
+    ]"
+  >
     {{ props.text }}
     <div v-if="props.type === 'action'" class="div__function">
       <slot />
@@ -62,10 +74,12 @@ const typeClass = computed(() => {
 <style scoped>
 td {
   height: 40px;
+  max-height: 40px;
   border-bottom: 1px solid #ddd;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  table-layout: initial;
 }
 .div__function {
   max-width: 100px;
@@ -74,6 +88,33 @@ td {
   flex-direction: row;
   visibility: hidden;
   gap: 8px;
+  height: 40px;
+}
+
+td.data_date {
+  text-align: center;
+  padding-right: 10px;
+}
+
+td.data_order {
+  width: calc(16px + 16px + 14px);
+  text-align: center;
+}
+
+td.column__function {
+  padding: 0 12px;
+}
+
+.position_center {
+  text-align: center !important;
+}
+
+.position_left {
+  text-align: left !important;
+}
+
+.position_right {
+  text-align: right !important;
 }
 
 td:hover .div__function {

@@ -20,6 +20,13 @@ const lang = computed(() => store.state.lang)
 
 const columnFields = [
   {
+    id: 0,
+    field: 'order',
+    label: 'STT',
+    type: 'order',
+    position: 'center'
+  },
+  {
     id: 1,
     field: fieldList.FIXED_ASSET_CODE,
     label: labelAsset[lang.value].FIXED_ASSET_CODE,
@@ -33,22 +40,10 @@ const columnFields = [
     type: 'string'
   },
   {
-    id: 3,
-    field: fieldList.FIXED_ASSET_CATEGORY_NAME,
-    label: labelAsset[lang.value].FIXED_ASSET_CATEGORY_NAME,
-    type: 'string'
-  },
-  {
     id: 4,
     field: fieldList.DEPARTMENT_NAME,
     label: labelAsset[lang.value].DEPARTMENT_NAME,
     type: 'string'
-  },
-  {
-    id: 5,
-    field: fieldList.QUANTITY,
-    label: labelAsset[lang.value].QUANTITY,
-    type: 'number'
   },
   {
     id: 6,
@@ -59,7 +54,7 @@ const columnFields = [
   {
     id: 7,
     field: fieldList.HMKH,
-    label: labelAsset[lang.value].HMKH,
+    label: 'Hao mòn năm',
     type: 'number',
     tooltip: tooltip[lang.value].HMKH
   },
@@ -115,7 +110,7 @@ onMounted(() => {
     <div ref="resizer" class="resize"></div>
     <div class="table">
       <table>
-        <MISATableHeader :action="false" :columns="columnFields" />
+        <MISATableHeader :hasCheckbox="false" :action="false" :columns="columnFields" />
         <MISATableBody :action="false" :hasCheckbox="false" />
       </table>
     </div>
@@ -134,11 +129,13 @@ onMounted(() => {
 .table {
   flex-grow: 1;
   overflow: auto;
+  border-radius: 4px;
 }
 table {
   width: 100%;
   border-collapse: collapse;
   background-color: var(--color-white);
+  border-radius: 4px;
 }
 .resize {
   height: 10px;

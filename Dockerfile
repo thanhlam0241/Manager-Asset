@@ -33,4 +33,4 @@ COPY . .
 EXPOSE 5173
 
 # Run the application.
-CMD npm i -g && npm run dev
+CMD sudo npm i -g && npm run dev

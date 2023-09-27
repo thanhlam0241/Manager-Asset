@@ -73,11 +73,11 @@ instance.interceptors.response.use((response) => {
             case 401:
                 // Handle Unauthorized calls here
                 // Display an alert if (typeof error.response.data === dataTypes.STRING)
-                // if (typeof error.response.data === dataTypes.STRING) {
-                //     sendEmitted(typeAction.INFO, error.response.data || 'Vui lòng đăng nhập lại.')
-                // }
-                // else
-                //     sendEmitted(types.ERROR, error.response.data.UserMessage || exceptionResource[lang].UNAUTHORIZED)
+                if (typeof error.response.data === dataTypes.STRING) {
+                    sendEmitted(typeAction.INFO, error.response.data || 'Vui lòng đăng nhập lại.')
+                }
+                else
+                    sendEmitted(types.ERROR, error.response.data.UserMessage || exceptionResource[lang].UNAUTHORIZED)
                 sendEmitted(typeAction.ERROR, "Phiên làm việc đã hết hạn. Đăng nhập lại")
                 break;
             case 404:

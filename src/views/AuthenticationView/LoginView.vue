@@ -1,5 +1,8 @@
 <template>
   <div class="login-form">
+    <MISABackdrop zIndex="1001" v-if="loading" type="fullscreen">
+      <MISALoading />
+    </MISABackdrop>
     <img class="img-background__login" src="/src/assets/image/Login.webp" alt="Login" />
     <div class="form__login">
       <img class="logo-misa" src="/src/assets/image/logo.svg" alt="Logo" />
@@ -47,12 +50,17 @@ const data = ref({
   password: ''
 })
 
+const loading = ref(false)
+
 const onSubmit = async () => {
   console.log(data.value)
-  const response = await authenticateApi.login(data.value)
+  loading.value = true
+  const response = await authenticateApi.login(data.value).finally(() => {
+    loading.value = false
+  })
   if (response) {
     console.log(response)
-    router.push('/')
+    router.push('/home')
   }
 }
 </script>

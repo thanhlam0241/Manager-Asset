@@ -1,11 +1,16 @@
 <script setup>
 import TableInformation from './Component/TableInformation.vue'
+import TableRecording from './Component/TableRecording.vue'
+
+import { ref } from 'vue'
+
 const tableFields = [
   {
     id: 1,
     field: 'order',
     label: 'STT',
-    type: 'date'
+    type: 'order',
+    position: 'center'
   },
   {
     id: 2,
@@ -39,6 +44,28 @@ const tableFields = [
     width: '40%'
   }
 ]
+
+const dataArray = ref([
+  {
+    order: 1,
+    recordingCode: 'ABC123',
+    recordingDate: '2023-09-26',
+    actionDate: '2023-09-27',
+    cost: 1000,
+    description: 'Lorem ipsum dolor sit amet.',
+    checked: false
+  },
+  {
+    order: 2,
+    recordingCode: 'DEF456',
+    recordingDate: '2023-09-27',
+    actionDate: '2023-09-28',
+    cost: 1500,
+    description: 'Consectetur adipiscing elit.',
+    checked: false
+  }
+  // Add more data objects as needed
+])
 </script>
 
 <template>
@@ -69,9 +96,9 @@ const tableFields = [
           ></MISAButton>
         </div>
       </div>
-      <table>
-        <MISATableHeader :sticky="false" :columns="tableFields" hasCheckbox action />
-      </table>
+      <div class="table">
+        <TableRecording :tableFields="tableFields" :data="dataArray" />
+      </div>
     </div>
     <TableInformation />
   </div>
@@ -110,15 +137,13 @@ const tableFields = [
   flex-direction: row;
   align-items: center;
 }
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background-color: var(--color-white);
-  position: relative;
-}
 .table-container {
   background-color: #fff;
   flex-grow: 1;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 .table-container__header {
   display: flex;
@@ -130,5 +155,9 @@ table {
   display: flex;
   flex-direction: row;
   gap: 10px;
+}
+.table {
+  flex-grow: 1;
+  overflow: auto;
 }
 </style>
