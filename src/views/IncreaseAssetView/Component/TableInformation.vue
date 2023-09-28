@@ -66,6 +66,8 @@ const columnFields = [
   }
 ]
 
+const emits = defineEmits(['changeHeight'])
+
 const resizer = ref(null)
 
 const tableContainerRef = ref(null)
@@ -91,10 +93,14 @@ function initResizeElement() {
 
   // Thực hiện event resize
   function doDrag(e) {
+    if (startHeight - e.clientY + startY > 300) {
+      stopDrag()
+    }
     element.style.height = startHeight - e.clientY + startY + 'px'
   }
   // Dừng event resize
   function stopDrag() {
+    emits('changeHeight', element.offsetHeight)
     document.documentElement.removeEventListener(events.MOUSEMOVE, doDrag, false)
     document.documentElement.removeEventListener(events.MOUSEUP, stopDrag, false)
   }
@@ -108,6 +114,10 @@ onMounted(() => {
 <template>
   <div ref="tableContainerRef" class="table-information">
     <div ref="resizer" class="resize"></div>
+    <div class="table-information-header">
+      <h3>Thông tin chi tiết</h3>
+      <span><i class="icon-fullscreen"></i></span>
+    </div>
     <div class="table">
       <table>
         <MISATableHeader :hasCheckbox="false" :action="false" :columns="columnFields" />
@@ -119,15 +129,28 @@ onMounted(() => {
 
 <style scoped>
 .table-information {
-  height: 200px;
-  min-height: 50px;
-  max-height: 400px;
+  min-height: 100px;
+  height: 300px;
   width: 100%;
   display: flex;
   flex-direction: column;
+  position: relative;
+}
+.table-information-header {
+  height: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px;
+  background-color: #fff;
+}
+.table-information-header span {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .table {
-  flex-grow: 1;
+  /* flex-grow: 1; */
   overflow: auto;
   border-radius: 4px;
 }
@@ -141,5 +164,7 @@ table {
   height: 10px;
   width: 100%;
   cursor: row-resize;
+  position: absolute;
+  top: 0;
 }
 </style>

@@ -16,32 +16,37 @@ const tableFields = [
     id: 2,
     field: 'recordingCode',
     label: 'Số chứng từ',
-    type: 'text'
+    type: 'text',
+    position: 'left'
   },
   {
     id: 3,
     field: 'recordingDate',
     label: 'Ngày chứng từ',
-    type: 'date'
+    type: 'date',
+    position: 'center'
   },
   {
     íd: 4,
     field: 'actionDate',
     label: 'Ngày ghi tăng',
-    type: 'date'
+    type: 'date',
+    position: 'center'
   },
   {
     id: 5,
     field: 'cost',
     label: 'Tổng nguyên giá',
-    type: 'number'
+    type: 'number',
+    position: 'right'
   },
   {
     id: 6,
     field: 'description',
     label: 'Nội dung',
     type: 'text',
-    width: '40%'
+    width: '40%',
+    position: 'left'
   }
 ]
 
@@ -63,9 +68,33 @@ const dataArray = ref([
     cost: 1500,
     description: 'Consectetur adipiscing elit.',
     checked: false
+  },
+  {
+    order: 3,
+    recordingCode: 'DEG456',
+    recordingDate: '2023-09-27',
+    actionDate: '2023-09-28',
+    cost: 1500,
+    description: 'Consectetur adipiscing elit.',
+    checked: false
+  },
+  {
+    order: 4,
+    recordingCode: 'DEG456',
+    recordingDate: '2023-09-27',
+    actionDate: '2023-09-28',
+    cost: 1500,
+    description: 'Consectetur adipiscing elit.',
+    checked: false
   }
   // Add more data objects as needed
 ])
+
+const heightTableInfor = ref(0)
+
+const changeTalbeInformationHeight = (height) => {
+  heightTableInfor.value = height
+}
 </script>
 
 <template>
@@ -97,10 +126,14 @@ const dataArray = ref([
         </div>
       </div>
       <div class="table">
-        <TableRecording :tableFields="tableFields" :data="dataArray" />
+        <TableRecording
+          :heightInfor="heightTableInfor"
+          :tableFields="tableFields"
+          :data="dataArray"
+        />
       </div>
     </div>
-    <TableInformation />
+    <TableInformation @change-height="changeTalbeInformationHeight" />
   </div>
 </template>
 
@@ -143,7 +176,6 @@ const dataArray = ref([
   border-radius: 4px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
 }
 .table-container__header {
   display: flex;

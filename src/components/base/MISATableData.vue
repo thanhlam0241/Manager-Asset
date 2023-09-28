@@ -24,6 +24,13 @@ const props = defineProps({
   width: {
     type: String,
     default: 'auto'
+  },
+  position: {
+    type: String,
+    default: 'left',
+    validate: (value) => {
+      return ['left', 'center', 'right'].includes(value)
+    }
   }
 })
 

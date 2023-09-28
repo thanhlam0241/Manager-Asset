@@ -30,7 +30,7 @@ USER node
 COPY . .
 
 # Expose the port that the application listens on.
-EXPOSE 5173
+EXPOSE 3000
 
 # Run the application.
-CMD sudo npm i -g && npm run dev
+CMD npm run dev

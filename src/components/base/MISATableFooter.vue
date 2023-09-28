@@ -46,7 +46,7 @@ const props = defineProps({
   },
   pagingList: {
     type: Array,
-    default: () => ['.', '.', '.']
+    default: () => []
   },
   colspan: {
     type: Number,
@@ -63,6 +63,14 @@ const props = defineProps({
   loadingPage: {
     type: Boolean,
     default: false
+  },
+  isSumDataSameRow: {
+    type: Boolean,
+    default: true
+  },
+  totalColumn: {
+    type: Number,
+    default: 1
   }
 })
 
@@ -161,6 +169,9 @@ const onClickPageIndex = (page, index) => {
 
 <template>
   <tfoot>
+    <tr class="row-sum" v-if="!props.isSumDataSameRow">
+      <slot />
+    </tr>
     <tr>
       <td :colspan="props.colspan">
         <div class="tfoot__page">
@@ -231,7 +242,8 @@ const onClickPageIndex = (page, index) => {
           </div>
         </div>
       </td>
-      <slot />
+      <slot v-if="props.isSumDataSameRow" />
+      <td v-else :colspan="props.totalColumn - props.colspan"></td>
       <td v-if="props.action"></td>
     </tr>
   </tfoot>
@@ -243,7 +255,9 @@ tfoot {
   width: 100%;
   background-color: var(--color-white);
   padding: 0 16px;
-  box-shadow: 0 -1px 0px 0 rgba(0, 0, 0, 0.2);
+  -webkit-box-shadow: 0px -4px 3px rgba(50, 50, 50, 0.75);
+  -moz-box-shadow: 0px -4px 3px rgba(50, 50, 50, 0.75);
+  box-shadow: 0px -1px 1px rgba(50, 50, 50, 0.75);
 }
 td.data__number {
   text-align: right;
@@ -258,7 +272,10 @@ tfoot {
   z-index: 4;
   box-shadow: 0 -1px 0px 0 rgba(0, 0, 0, 0.2);
 }
-
+tfoot tr {
+  height: 40px;
+  box-shadow: 0px -1px 0px rgba(50, 50, 50, 0.1);
+}
 .table.hide {
   overflow: hidden;
 }
@@ -338,7 +355,10 @@ tfoot td .tfoot__page {
   border-radius: var(--border-radius-size);
   cursor: pointer;
 }
-
+.row-sum {
+  background-color: #f5f5f5;
+  height: 40px;
+}
 .page__index.selected {
   font-weight: bold;
   background-color: var(--textfield-disabled-color);

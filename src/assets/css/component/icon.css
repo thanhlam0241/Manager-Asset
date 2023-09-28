@@ -256,3 +256,9 @@
   width: 18px;
   height: 18px;
 }
+
+.icon-fullscreen {
+  background: var(--url-image) no-repeat -245px -333px;
+  width: 14px;
+  height: 14px;
+}
