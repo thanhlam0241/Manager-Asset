@@ -1,6 +1,7 @@
 <script setup>
 import TableInformation from './Component/TableInformation.vue'
 import TableRecording from './Component/TableRecording.vue'
+import FormAddRecording from './Component/FormAddRecording.vue'
 
 import { ref } from 'vue'
 
@@ -92,6 +93,14 @@ const dataArray = ref([
 
 const heightTableInfor = ref(0)
 
+const open = ref({
+  formAddRecording: false
+})
+
+const toggleForm = () => {
+  open.value.formAddRecording = !open.value.formAddRecording
+}
+
 const changeTalbeInformationHeight = (height) => {
   heightTableInfor.value = height
 }
@@ -99,10 +108,11 @@ const changeTalbeInformationHeight = (height) => {
 
 <template>
   <div class="asset-page">
+    <form-add-recording v-if="open.formAddRecording" @close-form="toggleForm" />
     <div class="page-header">
       <h1>Ghi tăng tài sản</h1>
       <div class="header-action__container">
-        <MISAButton padding>Thêm</MISAButton>
+        <MISAButton @click="toggleForm" padding>Thêm</MISAButton>
         <div class="header_action">
           <div>
             <i class="icon-increase-page"></i>

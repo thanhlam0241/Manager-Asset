@@ -150,7 +150,7 @@ onMounted(() => {
   align-items: center;
 }
 .table {
-  /* flex-grow: 1; */
+  flex-grow: 1;
   overflow: auto;
   border-radius: 4px;
 }
@@ -159,6 +159,7 @@ table {
   border-collapse: collapse;
   background-color: var(--color-white);
   border-radius: 4px;
+  height: 100%;
 }
 .resize {
   height: 10px;

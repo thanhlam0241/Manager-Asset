@@ -2,6 +2,7 @@
 import MISATableRow from '@/components/base/MISATableRow.vue'
 import MISATableData from './MISATableData.vue'
 import { converStringToBigNumberString } from '@/helper/stringHelper'
+import { ref, onMounted, watch } from 'vue'
 
 /**
  * Props của table body
@@ -44,10 +45,32 @@ const props = defineProps({
     default: false
   }
 })
+
+const tBodyRef = ref(null)
+
+const heightBalance = ref(0)
+onMounted(() => {
+  if (props.data && props.data.length > 0) {
+    const height = tBodyRef.value.clientHeight
+    console.log(height - props.data.length * 40)
+    heightBalance.value = height - props.data.length * 40
+  }
+})
+watch(
+  () => props.data.length,
+  (value) => {
+    console.log(value)
+    if (tBodyRef.value) {
+      const height = tBodyRef.value.clientHeight
+      console.log(height - value * 40)
+      heightBalance.value = height - value * 40
+    }
+  }
+)
 </script>
 
 <template>
-  <tbody>
+  <tbody ref="tBodyRef">
     <MISATableRow
       :selected="item.isChecked"
       :focus="item.fixedAssetId === props.selectedId"
@@ -67,6 +90,7 @@ const props = defineProps({
         />
       </MISATableData>
       <MISATableData
+        :position="field.position"
         :type="field.type === 'number' ? 'number' : 'text'"
         v-for="field in props.columnFields"
         :key="field.id"
@@ -100,15 +124,14 @@ const props = defineProps({
         ></MISAButton>
       </MISATableData>
     </MISATableRow>
-    <MISATableRow height="40px" :key="`empty${i}`" v-for="i in props.emptyData"></MISATableRow>
+    <!-- <MISATableRow height="40px" :key="`empty${i}`" v-for="i in props.emptyData"></MISATableRow> -->
+    <tr :height="heightBalance" v-if="heightBalance > 0">
+      <td :height="heightBalance" :colspan="props.columnFields.length + 1"></td>
+    </tr>
   </tbody>
 </template>
 
 <style scoped>
-tbody {
-  height: 700px;
-}
-
 tbody:focus {
   border: none;
   outline: none;
