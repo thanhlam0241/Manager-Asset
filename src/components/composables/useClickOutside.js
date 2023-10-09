@@ -1,22 +1,19 @@
-import { onMounted, onUnmounted } from 'vue';
-
-export function useClickOutside(el_target_ref, callback_fn) {
-    if (!el_target_ref.value) return;
-    let listener = (e) => {
-        if (e.target === el_target_ref || el_target_ref.contains(e.target)) {
-            return;
+/**
+ * Event that is triggered when a click occurs outside the combobox.
+ * Created by: NTLam (2023-07-05).
+ */
+const useClickOutside = (document) => ({
+    mounted: function (el, binding) {
+        el.ClickOutsideHandler = function (event) {
+            if (!(el == event.target || el.contains(event.target))) {
+                binding.value(event)
+            }
         }
-
-        if (callback_fn && typeof callback_fn === 'function') {
-            callback_fn();
-        }
+        document.body.addEventListener('click', el.ClickOutsideHandler)
+    },
+    unmounted: function (el) {
+        document.body.removeEventListener('click', el.ClickOutsideHandler)
     }
+})
 
-    onMounted(() => {
-        document.addEventListener('click', listener);
-    })
-    onUnmounted(() => {
-        document.removeEventListener('click', listener);
-    })
-    return listener
-}
+export default useClickOutside;

@@ -7,6 +7,7 @@ export const exceptionResource = {
         'CONFLICT': 'Dữ liệu đã tồn tại',
         'INTERNAL_SERVER_ERROR': 'Lỗi hệ thống',
         'NOT_CHANGE': 'Dữ liệu không thay đổi !',
+        'NOT_ACCEPTABLE': 'Đăng nhập lại !'
     }
 }
 

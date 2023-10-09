@@ -1,5 +1,5 @@
 <template>
-  <div class="container" @contextmenu="() => {}">
+  <div ref="div_menu" class="container" @contextmenu="() => {}">
     <ul
       class="menu"
       :style="{
@@ -28,6 +28,7 @@
 </template>
 
 <script>
+import { ref } from 'vue'
 export default {
   props: [
     // props on 'menu'
@@ -45,6 +46,10 @@ export default {
       menuShow: false,
       items: []
     }
+  },
+  setup() {
+    const div_menu = ref(null)
+    return { div_menu }
   },
   methods: {
     parseFuncs(items) {
@@ -96,7 +101,8 @@ export default {
         } else {
           menu.style.left = event.pageX + 'px'
         }
-        if (menuHeight + event.pageY >= window.innerHeight - 50) {
+        console.log(menuHeight)
+        if (menuHeight + event.pageY >= window.innerHeight - 80) {
           menu.style.top = event.pageY - menuHeight + 'px'
         } else {
           menu.style.top = event.pageY + 'px'
@@ -118,6 +124,8 @@ export default {
 <style scoped>
 .container {
   z-index: var(--z-index-context-menu);
+  /* z-index: 1000; */
+  /* position: fixed; */
 }
 .container .menu {
   position: absolute;

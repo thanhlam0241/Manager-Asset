@@ -130,26 +130,30 @@ const columnFields = [
     id: 5,
     field: fieldList.QUANTITY,
     label: labelAsset[lang.value].QUANTITY,
-    type: 'number'
+    type: 'number',
+    position: 'right'
   },
   {
     id: 6,
     field: fieldList.COST,
     label: labelAsset[lang.value].COST,
-    type: 'number'
+    type: 'number',
+    position: 'right'
   },
   {
     id: 7,
     field: fieldList.HMKH,
     label: labelAsset[lang.value].HMKH,
     type: 'number',
+    position: 'right',
     tooltip: tooltip[lang.value].HMKH
   },
   {
     id: 8,
     field: fieldList.REMAINING_VALUE,
     label: labelAsset[lang.value].REMAINING_VALUE,
-    type: 'number'
+    type: 'number',
+    position: 'right'
   }
 ]
 

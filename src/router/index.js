@@ -42,7 +42,20 @@ const router = createRouter({
             return { size, page, search, did, facid }
           }
         },
-        { path: 'assets/write-increase', name: 'increase', component: IncreaseAssetView },
+        {
+          path: 'assets/write-increase', name: 'increase', component: IncreaseAssetView,
+          props: (route) => {
+            let size = parseInt(route.query.size)
+            size = isNaN(size) ? 20 : size
+            let page = parseInt(route.query.page)
+            page = isNaN(page) ? 1 : page
+            if (![20, 50, 100].includes(size)) {
+              size = 20
+            }
+            const search = route.query.search || ''
+            return { size, page, search }
+          }
+        },
         { path: '/:pathMatch(.*)*', name: 'not-found', component: NotFound },
       ]
     },

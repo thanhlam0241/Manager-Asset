@@ -721,6 +721,7 @@ label {
   overflow: auto;
   font-weight: 300;
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
 }
 
 .option-code {

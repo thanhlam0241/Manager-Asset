@@ -50,7 +50,6 @@ const props = defineProps({
  * Created by: NTLam (20/07/2023)
  */
 const thElm = ref(null)
-
 /**
  * Ref của startOffset
  * Created by: NTLam (20/07/2023)
@@ -148,7 +147,7 @@ onUnmounted(() => {
           <span class="th_text"> {{ column.label }}</span>
         </MISATooltip>
       </th>
-      <th v-if="props.action" class="column__function">
+      <th v-if="props.action" class="column__function" width="100">
         {{ props.showActionText ? 'Chức năng' : '' }}
       </th>
     </tr>
@@ -237,5 +236,9 @@ thead > tr > th {
   text-align: left;
   max-width: 200px;
   /* width: auto; */
+}
+
+.fix_div {
+  position: fixed;
 }
 </style>

@@ -171,7 +171,9 @@ const bold = computed(() => {
  * Created by: NTLam (20/07/2023)
  */
 const inputValue = ref(
-  props.defaultValue || (props.type === 'number' || props.type === 'float' ? 0 : '')
+  props.defaultValue && props.format
+    ? converStringToBigNumberString(props.defaultValue)
+    : props.defaultValue || (props.type === 'number' || props.type === 'float' ? 0 : '')
 )
 
 /**
@@ -220,7 +222,7 @@ const isValid = computed(() => {
     if (inputValue.value === '') return false
   }
   if (props.errorText) return false
-  if (props.type === 'number') {
+  if (props.type === 'number' && props.format) {
     return (
       inputValue.value == '0' ||
       checkIsNumberString(inputValue.value.toString().split('.').join(''))
@@ -370,7 +372,7 @@ const onFocus = (e) => {
 
 <style scoped>
 .input-text {
-  padding: 0 8px 0 0;
+  padding: 0 8px 0 8px;
   height: v-bind(height);
   border: v-bind(border);
   border-radius: var(--border-radius-size);

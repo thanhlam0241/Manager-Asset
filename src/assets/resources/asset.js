@@ -84,6 +84,8 @@ export const labelAsset = {
     'VIETNAMESE': {
         'FIXED_ASSET_CODE': 'Mã tài sản',
         'FIXED_ASSET_NAME': 'Tên tài sản',
+        'RECORDED_ASSET_CODE': 'Mã tài sản',
+        'RECORDED_ASSET_NAME': 'Tên tài sản',
         'DEPARTMENT_CODE': 'Mã bộ phận sử dụng',
         'DEPARTMENT_NAME': 'Tên bộ phận',
         'FIXED_ASSET_CATEGORY_CODE': 'Mã loại tài sản',
@@ -107,6 +109,9 @@ export const labelAsset = {
 export const fieldList = {
     'FIXED_ASSET_CODE': 'fixedAssetCode',
     'FIXED_ASSET_NAME': 'fixedAssetName',
+    'RECORDED_ASSET_CODE': 'recordedAssetCode',
+    'RECORDED_ASSET_NAME': 'recordedAssetName',
+    'VALUE': 'value',
     'DEPARTMENT_NAME': 'departmentName',
     'DEPARTMENT_CODE': 'departmentCode',
     'FIXED_ASSET_CATEGORY_CODE': 'fixedAssetCategoryCode',
@@ -131,6 +136,7 @@ export const contextMenu = {
         'DELETE': 'Xóa',
         'DUPLICATE': 'Nhân bản',
         'UNSELECT_ALL': 'Bỏ chọn tất cả',
+        'DETAIL': 'Chi tiết',
     }
 }
 

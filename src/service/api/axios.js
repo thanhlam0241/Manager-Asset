@@ -88,6 +88,14 @@ instance.interceptors.response.use((response) => {
                 else
                     sendEmitted(types.ERROR, error.response.data.UserMessage || exceptionResource[lang].NOT_FOUND)
                 break;
+            case 406:
+                // Handle 404 here
+                // redirect
+                if (typeof error.response.data === dataTypes.STRING)
+                    sendEmitted(typeAction.INFO, error.response.data)
+                else
+                    sendEmitted(types.INFO, error.response.data.UserMessage || exceptionResource[lang].NOT_ACCEPTABLE)
+                break;
             case 409:
                 // Handle 409 here
                 // redirect

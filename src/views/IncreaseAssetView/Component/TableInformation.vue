@@ -1,9 +1,16 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useStore } from 'vuex'
+import recordingApi from '@/service/api/recordingApi'
+import recordedAssetApi from '@/service/api/recordedAssetApi'
+import resourceBudgetApi from '@/service/api/resourceBudgetApi'
+import FormEditAsset from './FormEditAsset.vue'
 //resourses
 import { labelAsset, fieldList } from '@/assets/resources/asset'
-import { tooltip, events } from '@/assets/resources/common'
+import {
+  tooltip
+  //events
+} from '@/assets/resources/common'
 /**
  * The store object.
  * @type {import('vuex').Store}
@@ -18,6 +25,21 @@ const store = useStore()
  */
 const lang = computed(() => store.state.lang)
 
+const emit = defineEmits(['finishLoad'])
+const listResourceBudget = ref([])
+
+const props = defineProps({
+  recordingId: {
+    type: String,
+    default: ''
+  },
+  heightBalance: {
+    type: Number,
+    default: 0
+  }
+})
+const assetSelected = ref(null)
+
 const columnFields = [
   {
     id: 0,
@@ -28,15 +50,15 @@ const columnFields = [
   },
   {
     id: 1,
-    field: fieldList.FIXED_ASSET_CODE,
-    label: labelAsset[lang.value].FIXED_ASSET_CODE,
+    field: fieldList.RECORDED_ASSET_CODE,
+    label: labelAsset[lang.value].RECORDED_ASSET_CODE,
     type: 'string',
     canSort: true
   },
   {
     id: 2,
-    field: fieldList.FIXED_ASSET_NAME,
-    label: labelAsset[lang.value].FIXED_ASSET_NAME,
+    field: fieldList.RECORDED_ASSET_NAME,
+    label: labelAsset[lang.value].RECORDED_ASSET_NAME,
     type: 'string'
   },
   {
@@ -47,112 +69,180 @@ const columnFields = [
   },
   {
     id: 6,
-    field: fieldList.COST,
+    field: fieldList.VALUE,
     label: labelAsset[lang.value].COST,
-    type: 'number'
+    type: 'number',
+    position: 'right'
   },
   {
     id: 7,
     field: fieldList.HMKH,
     label: 'Hao mòn năm',
     type: 'number',
-    tooltip: tooltip[lang.value].HMKH
+    tooltip: tooltip[lang.value].HMKH,
+    position: 'right'
   },
   {
     id: 8,
     field: fieldList.REMAINING_VALUE,
     label: labelAsset[lang.value].REMAINING_VALUE,
-    type: 'number'
+    type: 'number',
+    position: 'right',
+    action: true
   }
 ]
+const data = ref([])
 
-const emits = defineEmits(['changeHeight'])
+const tableRef = ref(null)
 
-const resizer = ref(null)
+const dialogProps = ref({
+  open: false,
+  content: ''
+})
+const recordingCode = ref('')
+const loading = ref(false)
 
-const tableContainerRef = ref(null)
-
-/**
- * Chức năng: Khởi tạo sự kiện resize cho dialog-form
- * Created by: NTLam (20/07/2023)
- */
-function initResizeElement() {
-  let element = null
-  let startY, startHeight
-
-  resizer.value.addEventListener(events.MOUSEDOWN, initDrag, false)
-
-  // Khởi tạo event resize
-  function initDrag(e) {
-    element = tableContainerRef.value
-    startY = e.clientY
-    startHeight = parseInt(document.defaultView.getComputedStyle(element).height, 10)
-    document.documentElement.addEventListener(events.MOUSEMOVE, doDrag, false)
-    document.documentElement.addEventListener(events.MOUSEUP, stopDrag, false)
-  }
-
-  // Thực hiện event resize
-  function doDrag(e) {
-    if (startHeight - e.clientY + startY > 300) {
-      stopDrag()
-    }
-    element.style.height = startHeight - e.clientY + startY + 'px'
-  }
-  // Dừng event resize
-  function stopDrag() {
-    emits('changeHeight', element.offsetHeight)
-    document.documentElement.removeEventListener(events.MOUSEMOVE, doDrag, false)
-    document.documentElement.removeEventListener(events.MOUSEUP, stopDrag, false)
+const fetchData = async (id) => {
+  if (!id) return
+  const response = await recordingApi.getAllAsset(id)
+  if (response) {
+    console.log(response)
+    recordingCode.value = response.recordingCode
+    data.value = [...response.assets].map((item, index) => {
+      const hmkh = parseInt(item.value * (item.depreciationRate / 100))
+      return {
+        ...item,
+        order: index + 1,
+        hmkh: hmkh,
+        remainingValue: item.value - hmkh
+      }
+    })
+    tableRef.value.scrollTop = 0
+    emit('finishLoad')
   }
 }
 
-onMounted(() => {
-  initResizeElement()
+const idToDelete = ref('')
+
+const deleteAsset = async () => {
+  console.log(idToDelete.value)
+  if (!idToDelete.value) return
+  loading.value = true
+  const response = await recordedAssetApi.delete(idToDelete.value).finally(() => {
+    loading.value = false
+  })
+  if (response) {
+    closeDialog()
+    fetchData(props.recordingId)
+  }
+}
+
+const closeDialog = () => {
+  dialogProps.value.open = false
+  dialogProps.value.content = ''
+  idToDelete.value = ''
+}
+
+const startDelete = (id) => {
+  console.log(id)
+  idToDelete.value = id
+  dialogProps.value.open = true
+  dialogProps.value.content = `Bạn có muốn xóa tài sản mã <b>${
+    data.value.find((item) => item.recordedAssetId === id).recordedAssetCode
+  }</b> của chứng từ mã <b>${recordingCode.value}</b> không?`
+}
+
+const heightRow = computed(() => {
+  console.log(props.heightBalance)
+  return props.heightBalance - 40 * data.value.length
 })
+
+onMounted(async () => {
+  const responseResourceBudget = await resourceBudgetApi.getAll()
+  if (responseResourceBudget) {
+    listResourceBudget.value = responseResourceBudget
+  }
+  await fetchData(props.recordingId)
+})
+watch(
+  () => props.recordingId,
+  async (newValue) => {
+    await fetchData(newValue)
+  }
+)
+
+const onStartEdit = (id) => {
+  assetSelected.value = data.value.find((item) => item.recordedAssetId === id)
+}
+
+const onCloseEditForm = () => {
+  assetSelected.value = null
+}
+const onUpdateResourceAsset = async (code, value) => {
+  console.log(value)
+  const recordedAsset = data.value.find((item) => item.recordedAssetCode === code)
+  const dataUpdate = {
+    resourceAssets: value.map((item) => {
+      const resourceBudget = listResourceBudget.value.find(
+        (i) => i.resourceBudgetName === item.resourceBudgetName
+      )
+      return {
+        resourceBudget,
+        cost: item.cost,
+        resourceAssetId: item.resourceAssetId
+      }
+    })
+  }
+  const response = await recordedAssetApi.update(recordedAsset.recordedAssetId, dataUpdate)
+  if (response) {
+    fetchData(props.recordingId)
+    onCloseEditForm()
+  }
+  // onCloseEditForm()
+}
 </script>
 
 <template>
-  <div ref="tableContainerRef" class="table-information">
-    <div ref="resizer" class="resize"></div>
-    <div class="table-information-header">
-      <h3>Thông tin chi tiết</h3>
-      <span><i class="icon-fullscreen"></i></span>
-    </div>
-    <div class="table">
-      <table>
-        <MISATableHeader :hasCheckbox="false" :action="false" :columns="columnFields" />
-        <MISATableBody :action="false" :hasCheckbox="false" />
-      </table>
-    </div>
+  <div ref="tableRef" class="table">
+    <FormEditAsset
+      v-if="assetSelected"
+      @close-edit="onCloseEditForm"
+      @on-save="onUpdateResourceAsset"
+      :resourceBudget="listResourceBudget"
+      :assetSelected="assetSelected"
+      nameCode="recordedAssetCode"
+    />
+    <MISADialog
+      v-if="dialogProps.open"
+      :open="dialogProps.open"
+      :content="dialogProps.content"
+      @agree-dialog="deleteAsset"
+      @close-dialog="closeDialog"
+    />
+    <MISABackdrop zIndex="101" v-if="loading" type="fullscreen">
+      <MISALoading />
+    </MISABackdrop>
+    <table>
+      <MISATableHeader :hasCheckbox="false" :action="false" :columns="columnFields" />
+      <MISATableBody
+        nameId="recordedAssetId"
+        :action="false"
+        :hasCheckbox="false"
+        :columnFields="columnFields"
+        :data="data"
+        :heightBalance="heightRow"
+        @delete="startDelete"
+        @change="onStartEdit"
+      />
+    </table>
   </div>
 </template>
 
 <style scoped>
-.table-information {
-  min-height: 100px;
-  height: 300px;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-}
-.table-information-header {
-  height: 40px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px;
-  background-color: #fff;
-}
-.table-information-header span {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
 .table {
-  flex-grow: 1;
   overflow: auto;
   border-radius: 4px;
+  flex-grow: 1;
 }
 table {
   width: 100%;
@@ -160,12 +250,5 @@ table {
   background-color: var(--color-white);
   border-radius: 4px;
   height: 100%;
-}
-.resize {
-  height: 10px;
-  width: 100%;
-  cursor: row-resize;
-  position: absolute;
-  top: 0;
 }
 </style>

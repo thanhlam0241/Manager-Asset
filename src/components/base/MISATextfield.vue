@@ -21,6 +21,14 @@ const props = defineProps({
     default: '',
     required: false
   },
+  hasLabel: {
+    type: Boolean,
+    default: true
+  },
+  noMargin: {
+    type: Boolean,
+    default: false
+  },
   errorText: {
     type: String,
     default: 'Không được để trống ô này'
@@ -34,7 +42,8 @@ const props = defineProps({
   },
   width: {
     type: String,
-    required: false
+    required: false,
+    default: '100%'
   },
   required: {
     type: Boolean,
@@ -87,7 +96,9 @@ const refInput = ref(null)
 const height = computed(() => {
   return props.height
 })
-
+const width = computed(() => {
+  return props.width
+})
 /**
  * Giá trị của textfield
  * @type {import('vue').Ref<String>}
@@ -203,7 +214,7 @@ const toggle = () => {
 </script>
 
 <template>
-  <label>
+  <label v-if="props.hasLabel">
     <span v-if="props.label" :class="{ required: required }">{{ props.label }}</span>
     <div class="input-container">
       <input
@@ -229,6 +240,19 @@ const toggle = () => {
       props.errorText || 'Không được để trống'
     }}</span>
   </label>
+  <input
+    v-else
+    ref="refInput"
+    @keydown="onKeyDown"
+    :maxlength="props.maxlength"
+    v-focus
+    @focus="onFocus"
+    :class="{ error: error, 'no-margin': props.noMargin, disabled: props.disabled }"
+    :type="typeInput"
+    @blur="onBlur"
+    :placeholder="props.placeholder"
+    v-model="inputValue"
+  />
 </template>
 
 <style scoped>
@@ -245,12 +269,20 @@ input:disabled {
   border-color: #bdbdbd;
   pointer-events: none;
   box-shadow: none;
+  color: black;
+}
+input.disabled {
+  background-color: var(--textfield-disabled-color);
+  border-color: #bdbdbd;
+  pointer-events: none;
+  box-shadow: none;
+  color: black;
 }
 input {
   height: var(--textfield-height);
   display: block;
-  width: 100%;
   height: v-bind(height);
+  width: v-bind(width);
   border-radius: var(--border-radius-size);
   border: 1px solid var(--textfield-border-color);
   margin-top: 8px;
@@ -260,6 +292,9 @@ input {
   font-weight: 400;
   font-family: 'MISA font';
   transition: all ease 400ms;
+}
+input.no-margin {
+  margin: 0 !important;
 }
 input[type='date']::-webkit-calendar-picker-indicator {
   color: rgba(0, 0, 0, 0);

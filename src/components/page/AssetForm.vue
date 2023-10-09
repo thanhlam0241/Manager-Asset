@@ -1146,10 +1146,6 @@ footer {
   align-items: center;
   justify-content: center;
 }
-.btn-close:focus {
-  outline: 1px solid var(--primary-color);
-}
-
 .resizer-right {
   width: 5px !important;
   height: 100%;

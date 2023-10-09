@@ -32,6 +32,23 @@ class FixedAssetApi {
         }
         return axios.post(`${fixedAssetRoute}/filter?${filterQuery.length > 0 ? filterQuery.join('&') : ''}`, dataBody)
     }
+    getFilterExcept(filter) {
+        let filterQuery = [];
+        let dataBody = {}
+        if (filter.pageSize) {
+            filterQuery.push(`pageSize=${filter.pageSize}`)
+        }
+        if (filter.pageNumber) {
+            filterQuery.push(`pageNumber=${filter.pageNumber}`)
+        }
+        if (filter.filterString) {
+            filterQuery.push(`filterString=${filter.filterString}`)
+        }
+        if (filter.codeExcepts) {
+            dataBody.codeExcepts = filter.codeExcepts
+        }
+        return axios.post(`${fixedAssetRoute}/filter-except?${filterQuery.length > 0 ? filterQuery.join('&') : ''}`, dataBody)
+    }
     async exportExcel(filter, callback) {
         if (typeof callback === 'function') {
             callback();

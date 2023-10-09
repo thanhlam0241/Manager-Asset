@@ -131,7 +131,7 @@ function checkIsNumberFormatString(value) {
  * undefined: không phải là chuỗi
  * */
 function checkIsNumberString(value) {
-    let regex = /^[0-9]+$/;
+    let regex = /^[1-9][0-9]*$/;
     return regex.test(value);
 }
 

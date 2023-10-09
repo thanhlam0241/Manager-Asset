@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from 'vue'
+// import { converStringToBigNumberString } from '@/helper/stringHelper.js'
 
 /**
  * Props của table data
@@ -31,6 +32,14 @@ const props = defineProps({
     validate: (value) => {
       return ['left', 'center', 'right'].includes(value)
     }
+  },
+  action: {
+    type: Boolean,
+    default: false
+  },
+  borderBottom: {
+    type: Boolean,
+    default: true
   }
 })
 
@@ -58,16 +67,40 @@ const typeClass = computed(() => {
 
 <template>
   <td
+    v-if="props.action"
     :width="props.width"
     height="40"
     :class="[
       typeClass,
-      { data__number: type === 'number' },
-      { data_date: type === 'date' },
-      { data_order: type === 'order' },
-      { position_center: position === 'center' },
-      { position_left: position === 'left' },
-      { position_right: position === 'right' }
+      { data__number: props.type === 'number' },
+      { data_date: props.type === 'date' },
+      { data_order: props.type === 'order' },
+      { position_center: props.position === 'center' },
+      { position_left: props.position === 'left' },
+      { position_right: props.position === 'right' },
+      { 'border-at-bottom': props.borderBottom }
+    ]"
+  >
+    <div class="div_relative">
+      {{ props.text }}
+      <div class="div__function_absolute">
+        <slot />
+      </div>
+    </div>
+  </td>
+  <td
+    v-else
+    :width="props.width"
+    height="40"
+    :class="[
+      typeClass,
+      { data__number: props.type === 'number' },
+      { data_date: props.type === 'date' },
+      { data_order: props.type === 'order' },
+      { position_center: props.position === 'center' },
+      { position_left: props.position === 'left' },
+      { position_right: props.position === 'right' },
+      { 'border-at-bottom': props.borderBottom }
     ]"
   >
     {{ props.text }}
@@ -79,15 +112,38 @@ const typeClass = computed(() => {
 </template>
 
 <style scoped>
+.div_relative {
+  position: relative;
+  line-height: 40px;
+}
+.div__function_absolute {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  gap: 8px;
+  height: 40px;
+  position: absolute;
+  visibility: hidden;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+tr:has(td):hover .div__function_absolute {
+  visibility: visible;
+}
 td {
   height: 40px;
   max-height: 40px;
-  border-bottom: 1px solid #ddd;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   table-layout: initial;
+  border-bottom: 1px solid #ddd;
+  /* box-shadow: 0 -1px 0 #000; */
+  /* outline: 1px solid #ddd; */
+  /* background-color: red; */
 }
+
 .div__function {
   max-width: 100px;
   display: flex;

@@ -2,37 +2,49 @@ import axios from './axios';
 
 const recordingRoute = '/Recordings';
 
+const recordingAssetRoute = '/RecordingAsset';
+
 class RecordingApi {
     getAll() {
         return axios.get(`${recordingRoute}`);
     }
+    getAllAsset(id) {
+        return axios.get(`${recordingAssetRoute}/${id}`);
+    }
     get(id) {
         return axios.get(`${recordingRoute}/${id}`);
     }
+    getAssetByRecordingId(id) {
+        if (!id) return 'Id không được để trống'
+        return axios.get(`${recordingAssetRoute}/${id}`);
+    }
     getFilter(filter) {
         let filterQuery = [];
-        if (filter.pageSize) {
-            filterQuery.push(`pageSize=${filter.pageSize}`)
+        if (filter.size) {
+            filterQuery.push(`pageSize=${filter.size}`)
         }
-        if (filter.pageNumber) {
-            filterQuery.push(`pageNumber=${filter.pageNumber}`)
+        if (filter.page) {
+            filterQuery.push(`pageNumber=${filter.page}`)
         }
-        if (filter.filterString) {
-            filterQuery.push(`filterString=${filter.filterString}`)
+        if (filter.search) {
+            filterQuery.push(`filterString=${filter.search}`)
         }
-        return axios.post(`${recordingRoute}/filter?${filterQuery.length > 0 ? filterQuery.join('&') : ''}`)
+        return axios.get(`${recordingRoute}/filter?${filterQuery.length > 0 ? filterQuery.join('&') : ''}`)
     }
     getNewCode() {
         return axios.get(`${recordingRoute}/new-code`);
     }
     create(data) {
-        return axios.post(`${recordingRoute}`, data);
+        return axios.post(`${recordingAssetRoute}`, data);
     }
     update(id, data) {
         return axios.put(`${recordingRoute}/${id}`, data);
     }
     delete(id) {
         return axios.delete(`${recordingRoute}/${id}`);
+    }
+    deleteMulti(ids) {
+        return axios.delete(`${recordingRoute}/multiple`, { data: ids });
     }
 }
 

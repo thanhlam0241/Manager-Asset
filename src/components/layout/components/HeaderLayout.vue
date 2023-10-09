@@ -1,7 +1,21 @@
 <script setup>
+import { ref } from 'vue'
+import useClickOutside from '@/components/composables/useClickOutside'
 defineProps({
   sidebarShow: Boolean
 })
+
+const vClickOutside = useClickOutside(document)
+
+const isShowPopup = ref(false)
+
+const togglePopup = () => {
+  isShowPopup.value = true
+}
+
+const closePopup = () => {
+  isShowPopup.value = false
+}
 </script>
 
 <template>
@@ -24,12 +38,27 @@ defineProps({
           <i class="icon-bell-outline"></i>
           <i class="icon-grid"></i>
           <i class="icon-question"></i>
-          <i class="icon-user">
-            <i class="icon-caret-down"></i>
-          </i>
+          <div v-click-outside="closePopup" class="div_show_option" @click="togglePopup">
+            <i class="icon-user">
+              <i class="icon-caret-down"></i>
+            </i>
+            <div :class="['options', { show: isShowPopup }]">
+              <ul>
+                <li>
+                  <i class="icon-user"></i>
+                  <span>Thông tin cá nhân</span>
+                </li>
+                <li>
+                  <i class="icon-logout"></i>
+                  <span>Đăng xuất</span>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
-      </div></header
-  ></Teleport>
+      </div>
+    </header></Teleport
+  >
 </template>
 
 <style scoped>
@@ -47,6 +76,41 @@ defineProps({
   overflow: hidden;
   text-overflow: ellipsis; */
   gap: 10px;
+}
+
+.div_show_option {
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 100;
+}
+.options {
+  position: absolute;
+  width: 150px;
+  top: calc(100% + 4px);
+  right: 0;
+  background-color: #fff;
+  padding: 10px;
+  border-radius: 4px;
+  box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.5);
+  visibility: hidden;
+}
+
+.options.show {
+  visibility: visible;
+}
+
+.options li {
+  list-style: none;
+  padding: 5px;
+  border-radius: 4px;
+}
+
+.options li:hover {
+  background-color: #f5f5f5;
+  cursor: pointer;
 }
 
 h2 {

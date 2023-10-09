@@ -45,6 +45,10 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
+  outline: {
+    type: Boolean,
+    default: false
+  },
   autofocus: {
     type: Boolean,
     default: false
@@ -137,7 +141,8 @@ const vFocus = {
       { 'color-blue': props.backgroundColor },
       { shadow: props.shadow },
       { 'padding-high': props.padding },
-      { circle: props.circle }
+      { circle: props.circle },
+      { outline: props.outline }
     ]"
     v-bind:disabled="props.disabled"
   >
@@ -177,7 +182,7 @@ button.color-blue {
 .btn--main:hover {
   background-color: var(--main-color-hover);
 }
-.btn--main:focus {
+.outline.btn--main:focus {
   background-color: var(--main-color-focus);
   outline: 2px solid var(--outline-active);
 }
@@ -204,7 +209,7 @@ button.color-blue {
 .btn--sub:hover {
   background-color: var(--sub-color-hover);
 }
-.btn--sub:focus {
+.outline.btn--sub:focus {
   background-color: var(--sub-color-focus);
   outline: 2px solid var(--outline-active);
 }
@@ -233,7 +238,7 @@ button.color-blue {
   color: var(--color-white);
   border-color: transparent;
 }
-.btn--outline:focus {
+.outline.btn--outline:focus {
   background-color: var(--outline-color-focus);
   outline: 3px solid var(--outline-active);
   color: var(--color-white);
@@ -258,10 +263,13 @@ button.color-blue {
   align-items: center;
   background: var(--color-white);
   cursor: pointer;
-  border-radius: var(--border-radius-size);
-  border: 1px solid transparent;
+  border-radius: 50%;
+  /* border: 1px solid transparent; */
 }
-.btn--icon:focus {
+.btn--icon:hover {
+  background-color: #f5f5f5;
+}
+.outline.btn--icon:focus {
   border-color: var(--primary-color);
 }
 .btn--icon:disabled {

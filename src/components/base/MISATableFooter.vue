@@ -1,6 +1,6 @@
 <script setup>
 import { converStringToBigNumberString } from '@/helper/stringHelper.js'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { table } from '@/assets/resources/asset'
 import { useStore } from 'vuex'
 
@@ -165,11 +165,47 @@ const onClickPageIndex = (page, index) => {
     }
   }
 }
+
+const openSumaryFoot = ref(true)
+
+const pageList = computed(() => {
+  const list = []
+  const numberPage = props.numberOfPage
+  const currentPage = props.currentPage
+  if (numberPage <= 7) {
+    for (let i = 1; i <= numberPage; i++) {
+      list.push(i)
+    }
+  } else {
+    if (currentPage <= 4) {
+      list.push(1, 2, 3, 4, 5, '...', numberPage)
+    } else if (currentPage >= numberPage - 4) {
+      list.push(
+        1,
+        '...',
+        numberPage - 4,
+        numberPage - 3,
+        numberPage - 2,
+        numberPage - 1,
+        numberPage
+      )
+    } else {
+      list.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', numberPage)
+    }
+  }
+  return list
+})
+
+const openPaging = ref(true)
 </script>
 
 <template>
-  <tfoot>
-    <tr class="row-sum" v-if="!props.isSumDataSameRow">
+  <tfoot v-if="openPaging">
+    <tr
+      @click="() => (openSumaryFoot = false)"
+      class="row-sum"
+      v-if="!props.isSumDataSameRow && openSumaryFoot"
+    >
       <slot />
     </tr>
     <tr>
@@ -226,7 +262,7 @@ const onClickPageIndex = (page, index) => {
                 { showMorePage: page === '...' },
                 { disabled: page === '...' && pageToGo > 0 }
               ]"
-              v-for="(page, index) in props.pagingList"
+              v-for="(page, index) in pageList"
               @click.stop.prevent="() => onClickPageIndex(page, index)"
               :key="'page' + page + index"
             >
@@ -255,9 +291,9 @@ tfoot {
   width: 100%;
   background-color: var(--color-white);
   padding: 0 16px;
-  -webkit-box-shadow: 0px -4px 3px rgba(50, 50, 50, 0.75);
+  /* -webkit-box-shadow: 0px -4px 3px rgba(50, 50, 50, 0.75);
   -moz-box-shadow: 0px -4px 3px rgba(50, 50, 50, 0.75);
-  box-shadow: 0px -1px 1px rgba(50, 50, 50, 0.75);
+  box-shadow: 0px -1px 1px rgba(50, 50, 50, 0.75); */
 }
 td.data__number {
   text-align: right;
@@ -268,13 +304,14 @@ tfoot td,
 tfoot {
   position: -webkit-sticky;
   position: sticky;
-  bottom: 0;
+  bottom: -1px;
   z-index: 4;
+
   box-shadow: 0 -1px 0px 0 rgba(0, 0, 0, 0.2);
 }
 tfoot tr {
   height: 40px;
-  box-shadow: 0px -1px 0px rgba(50, 50, 50, 0.1);
+  /* box-shadow: 0px -1px 0px rgba(50, 50, 50, 0.1); */
 }
 .table.hide {
   overflow: hidden;
@@ -320,10 +357,10 @@ tfoot td .tfoot__page {
   background-color: var(--color-white);
   z-index: 100;
   top: -45px;
-  border: 1px solid #ccc;
+  /* border: 1px solid #ccc; */
   border-radius: var(--border-radius-size);
   overflow-y: auto;
-  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
+  /* box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2); */
   padding: 2px;
   display: none;
   padding: 0 10px;

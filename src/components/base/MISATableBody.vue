@@ -2,7 +2,6 @@
 import MISATableRow from '@/components/base/MISATableRow.vue'
 import MISATableData from './MISATableData.vue'
 import { converStringToBigNumberString } from '@/helper/stringHelper'
-import { ref, onMounted, watch } from 'vue'
 
 /**
  * Props của table body
@@ -43,73 +42,116 @@ const props = defineProps({
   isShowEmpty: {
     type: Boolean,
     default: false
+  },
+  heightBalance: {
+    type: Number,
+    default: 0
+  },
+  actionInLast: {
+    type: Boolean,
+    default: false
+  },
+  nameId: {
+    type: String,
+    default: 'fixedAssetId'
   }
 })
 
-const tBodyRef = ref(null)
+const emits = defineEmits([
+  'selectRow',
+  'selectCheckboxRow',
+  'changeRecord',
+  'deleteRecord',
+  'ctrlClick',
+  'doubleClick',
+  'clickCtrl',
+  'shiftClick',
+  'clickFocusing',
+  'contextMenu',
+  'changeDialog',
+  'duplicateDialog',
+  'delete',
+  'change'
+])
 
-const heightBalance = ref(0)
-onMounted(() => {
-  if (props.data && props.data.length > 0) {
-    const height = tBodyRef.value.clientHeight
-    console.log(height - props.data.length * 40)
-    heightBalance.value = height - props.data.length * 40
+const onMousedownRow = (e, id) => {
+  if (e.shiftKey) {
+    emits('shiftClick', id)
+  } else if (e.ctrlKey) {
+    emits('clickCtrl', id)
+  } else {
+    emits('clickFocusing', id)
   }
-})
-watch(
-  () => props.data.length,
-  (value) => {
-    console.log(value)
-    if (tBodyRef.value) {
-      const height = tBodyRef.value.clientHeight
-      console.log(height - value * 40)
-      heightBalance.value = height - value * 40
-    }
-  }
-)
+}
 </script>
 
 <template>
-  <tbody ref="tBodyRef">
+  <tbody>
     <MISATableRow
       :selected="item.isChecked"
       :focus="item.fixedAssetId === props.selectedId"
-      v-for="(item, index) in data"
+      v-for="(item, index) in props.data"
       :key="'row' + item.fixedAssetId"
-      v-on:dblclick="$emit('doubleClick', item.fixedAssetId)"
-      @click.ctrl="$emit('clickCtrl', item.fixedAssetId)"
-      @click.shift="$emit('shiftClick', item.fixedAssetId)"
-      @mousedown.stop="$emit('clickFocusing', item.fixedAssetId)"
-      @contextmenu.prevent="(event) => $emit('contextMenu', event, item.fixedAssetId)"
+      v-on:dblclick="$emit('doubleClick', item[props.nameId])"
+      @click.ctrl.prevent="$emit('clickCtrl', item[props.nameId])"
+      @click.shift.stop.prevent="$emit('shiftClick', item[props.nameId])"
+      @mousedown.stop.prevent="(e) => onMousedownRow(e, item[props.nameId])"
+      @contextmenu.prevent="(event) => $emit('contextMenu', event, item[props.nameId])"
       :isSelected="props.data[index].fixedAssetId === props.selectedId"
     >
       <MISATableData v-if="props.hasCheckbox" type="checkbox">
         <MISACheckbox
           :value="item.isChecked"
-          @mousedown.stop.prevent.self="$emit('selectRow', item.fixedAssetId)"
+          @mousedown.stop.prevent.self="$emit('selectRow', item[props.nameId])"
         />
       </MISATableData>
       <MISATableData
         :position="field.position"
-        :type="field.type === 'number' ? 'number' : 'text'"
+        :type="field.type"
         v-for="field in props.columnFields"
         :key="field.id"
+        :action="field.action"
+        :text="
+          field.action
+            ? field.type === 'number'
+              ? converStringToBigNumberString(item[field.field].toString())
+              : item[field.field].toString()
+            : null
+        "
       >
         {{
-          field.type === 'number'
-            ? item[field.field]
-              ? converStringToBigNumberString(item[field.field])
-              : 0
-            : item[field.field]
-            ? item[field.field]
-            : 'Chưa có dữ liệu'
+          !field.action
+            ? field.type === 'number'
+              ? item[field.field]
+                ? converStringToBigNumberString(item[field.field])
+                : 0
+              : item[field.field]
+              ? item[field.field]
+              : 'Chưa có dữ liệu'
+            : null
         }}
+        <MISAButton
+          v-if="field.action"
+          width="32px"
+          height="32px"
+          @click="$emit('change', item[props.nameId])"
+          type="icon"
+          ><i class="icon-pencil"></i
+        ></MISAButton>
+        <MISAButton
+          v-if="field.action"
+          width="32px"
+          height="32px"
+          @click="$emit('delete', item[props.nameId])"
+          type="icon"
+          ><i class="icon-delete-red"></i
+        ></MISAButton>
       </MISATableData>
-      <MISATableData v-if="props.action" width="100px" type="action">
+      <MISATableData v-if="props.action" width="100" type="action">
         <MISAButton
           width="24px"
           height="24px"
-          @click="$emit('changeDialog', item.fixedAssetId)"
+          @click="$emit('changeDialog', item[props.nameId])"
           transparent
           type="icon"
           ><i class="icon-pencil"></i
@@ -117,7 +159,7 @@ watch(
         <MISAButton
           width="24px"
           height="24px"
-          @click="$emit('duplicateDialog', item.fixedAssetId)"
+          @click="$emit('duplicateDialog', item[props.nameId])"
           transparent
           type="icon"
           ><i class="icon-duplicate"></i
@@ -125,8 +167,8 @@ watch(
       </MISATableData>
     </MISATableRow>
     <!-- <MISATableRow height="40px" :key="`empty${i}`" v-for="i in props.emptyData"></MISATableRow> -->
-    <tr :height="heightBalance" v-if="heightBalance > 0">
-      <td :height="heightBalance" :colspan="props.columnFields.length + 1"></td>
+    <tr :height="props.heightBalance" v-if="heightBalance > 0">
+      <td :height="props.heightBalance" :colspan="props.columnFields.length + 1"></td>
     </tr>
   </tbody>
 </template>
@@ -136,10 +178,6 @@ tbody:focus {
   border: none;
   outline: none;
 }
-tbody > tr > td {
-  border-bottom: 1px solid #ddd;
-}
-
 th.column__function {
   padding: 0 12px;
 }
