@@ -262,3 +262,14 @@
   width: 14px;
   height: 14px;
 }
+.icon-menu {
+  background: var(--url-image) no-repeat -22px -421px;
+  width: 20px;
+  height: 15px;
+}
+
+.icon-show-full {
+  background: var(--url-image) no-repeat -110px -420px;
+  width: 20px;
+  height: 15px;
+}

@@ -1,6 +1,9 @@
 <script setup>
 import { ref } from 'vue'
 import useClickOutside from '@/components/composables/useClickOutside'
+import authenticateApi from '@/service/api/authenticateApi'
+import router from '@/router'
+
 defineProps({
   sidebarShow: Boolean
 })
@@ -15,6 +18,12 @@ const togglePopup = () => {
 
 const closePopup = () => {
   isShowPopup.value = false
+}
+
+const logout = async () => {
+  await authenticateApi.logout().then(() => {
+    router.push('/authentication/login')
+  })
 }
 </script>
 
@@ -48,7 +57,7 @@ const closePopup = () => {
                   <i class="icon-user"></i>
                   <span>Thông tin cá nhân</span>
                 </li>
-                <li>
+                <li @click="logout">
                   <i class="icon-logout"></i>
                   <span>Đăng xuất</span>
                 </li>

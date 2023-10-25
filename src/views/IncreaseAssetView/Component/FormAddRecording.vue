@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { useStore } from 'vuex'
 //resourses
 import { labelAsset, fieldList } from '@/assets/resources/asset'
@@ -9,6 +9,7 @@ import resourceBudgetApi from '@/service/api/resourceBudgetApi'
 import FormSelectIncreaseAsset from './FormSelectIncreaseAsset.vue'
 import FormEditAsset from './FormEditAsset.vue'
 import { converStringToBigNumberString } from '@/helper/stringHelper'
+import { formatISODateString } from '@/helper/object'
 
 /**
  * The store object.
@@ -24,6 +25,11 @@ const store = useStore()
  */
 const lang = computed(() => store.state.lang)
 
+/**
+ * The props of the component.
+ * @type {import('vue').DefineProps<{}>}
+ * Creatd by: NTLam (15/8/2023)
+ */
 const props = defineProps({
   idRecording: {
     type: String,
@@ -38,6 +44,11 @@ const props = defineProps({
   }
 })
 
+/**
+ * The fields of the table.
+ * @type {import('vue').Ref<import('@/components/MISATable/MISATableHeader').TableHeader[]>}
+ * Creatd by: NTLam (15/8/2023)
+ */
 const tableFields = [
   {
     id: 0,
@@ -48,14 +59,14 @@ const tableFields = [
   },
   {
     id: 1,
-    field: fieldList.FIXED_ASSET_CODE,
+    field: 'recordedAssetCode',
     label: labelAsset[lang.value].FIXED_ASSET_CODE,
     type: 'string',
     canSort: true
   },
   {
     id: 2,
-    field: fieldList.FIXED_ASSET_NAME,
+    field: 'recordedAssetName',
     label: labelAsset[lang.value].FIXED_ASSET_NAME,
     type: 'string'
   },
@@ -67,7 +78,7 @@ const tableFields = [
   },
   {
     id: 6,
-    field: fieldList.COST,
+    field: 'value',
     label: labelAsset[lang.value].COST,
     type: 'number',
     position: 'right'
@@ -89,8 +100,22 @@ const tableFields = [
   }
 ]
 
+/**
+ * The list of resource budget.
+ * Created by: NTLam (20/07/2023)
+ */
 const listResourceBudget = ref([])
 
+/**
+ * The reference of the head
+ * Created by: NTLam (20/07/2023)
+ */
+const headRef = ref(null)
+
+/**
+ * The data of the form.
+ * Created by: NTLam (20/07/2023)
+ */
 const formData = ref({
   recordingCode: {
     value: '',
@@ -117,14 +142,27 @@ const formData = ref({
     defaultValue: ''
   }
 })
+
+/**
+ * The state of form, dialog.
+ * Created by: NTLam (20/07/2023)
+ */
 const open = ref({
   formSelectIncreaseAsset: false,
   formChangeAsset: false,
   dialog: false
 })
 
+/**
+ * The data of the table.
+ * Created by: NTLam (20/07/2023)
+ */
 const data = ref([])
 
+/**
+ * The data of the page.
+ * Created by: NTLam (20/07/2023)
+ */
 const pageData = ref({
   numberOfPage: 1,
   pageSize: 20,
@@ -133,22 +171,84 @@ const pageData = ref({
   pagingList: []
 })
 
+/**
+ * The reference of the dialog.
+ * Created by: NTLam (20/07/2023)
+ */
+const dialogRef = ref(null)
+
+/**
+ * The list of assets id.
+ * Created by: NTLam (20/07/2023)
+ */
 const listAssetsId = ref([])
 
-const emits = defineEmits(['close-form'])
+/**
+ * The emits of the component.
+ */
+const emits = defineEmits(['close-form', 'create-recording', 'update-recording'])
 
+/**
+ * The reference of the body.
+ * Created by: NTLam (20/07/2023)
+ */
 const tBodyRef = ref(null)
 
+/**
+ * The height balance of the table.
+ * Created by: NTLam (20/07/2023)
+ */
 const heightBalance = ref(0)
 
+/**
+ * The state of open edit form.
+ * Created by: NTLam (20/07/2023)
+ */
 const openEditAsset = ref(false)
 
+/**
+ * The asset selected.
+ * Created by: NTLam (20/07/2023)
+ */
 const assetSelected = ref(null)
 
+/**
+ * The reference of the table container.
+ * Created by: NTLam (20/07/2023)
+ */
 const table_container = ref(null)
 
+/**
+ * The list of asset id deletes.
+ * Created by: NTLam (20/07/2023)
+ */
+const listAssetIdDeletes = ref([])
+
+/**
+ * The reference of the table.
+ * Created by: NTLam (20/07/2023)
+ */
 const tableRef = ref(null)
 
+/**
+ * The state of loading.
+ * Created by: NTLam (20/07/2023)
+ */
+const loading = ref(false)
+
+/**
+ * The props of the dialog.
+ * Created by: NTLam (20/07/2023)
+ */
+const dialogProps = ref({
+  open: false,
+  content: ''
+})
+
+/**
+ * The sum data of the table.
+ * Created by: NTLam (20/07/2023)
+ */
 const sumData = computed(() => {
   const result = {
     cost: 0,
@@ -157,7 +257,7 @@ const sumData = computed(() => {
   }
 
   data.value.forEach((item) => {
-    result.cost += item.cost
+    result.cost += item.value
     result.hmkh += item.hmkh
     result.remainingValue += item.remainingValue
   })
@@ -165,61 +265,220 @@ const sumData = computed(() => {
   return result
 })
 
+/**
+ * Chức năng: Khởi tạo sự kiện drag cho dialog-form
+ * Created by: NTLam (20/07/2023)
+ */
+function initDragElement() {
+  var pos1 = 0,
+    pos2 = 0,
+    pos3 = 0,
+    pos4 = 0
+  var elmnt = null
+  var currentZIndex = 100 //TODO reset z index when a threshold is passed
+
+  dialogRef.value.onmousedown = function () {
+    dialogRef.value.style.zIndex = '' + ++currentZIndex
+  }
+
+  headRef.value.onmousedown = dragMouseDown
+
+  // Khởi tạo event drag
+  function dragMouseDown(e) {
+    elmnt = dialogRef.value
+    elmnt.style.zIndex = '' + ++currentZIndex
+
+    e = e || window.event
+    // get the mouse cursor position at startup:
+    pos3 = e.clientX
+    pos4 = e.clientY
+    document.onmouseup = closeDragElement
+    // call a function whenever the cursor moves:
+    document.onmousemove = elementDrag
+  }
+
+  // Thực hiện event drag
+  function elementDrag(e) {
+    if (!elmnt) {
+      return
+    }
+    e = e || window.event
+    // calculate the new cursor position:
+    pos1 = pos3 - e.clientX
+    pos2 = pos4 - e.clientY
+    pos3 = e.clientX
+    pos4 = e.clientY
+
+    elmnt.style.top = elmnt.offsetTop - pos2 + 'px'
+    elmnt.style.left = elmnt.offsetLeft - pos1 + 'px'
+  }
+
+  // Dừng event drag
+  function closeDragElement() {
+    /* stop moving when mouse button is released:*/
+    document.onmouseup = null
+    document.onmousemove = null
+  }
+}
+
+/**
+ * Chức năng: Canh giữa dialog-form
+ * Created by: NTLam (20/07/2023)
+ */
+const centerTheForm = () => {
+  const width = dialogRef.value.offsetWidth
+  const height = dialogRef.value.offsetHeight
+
+  dialogRef.value.style.top = `calc(50vh - ${height / 2}px)`
+  dialogRef.value.style.left = `calc(50vw - ${width / 2}px)`
+}
+
+/**
+ * Các sự kiện khi component được khởi tạo
+ * Created by: NTLam (20/07/2023)
+ */
 onMounted(async () => {
-  const dateNow = new Date()
+  initDragElement()
+  centerTheForm()
+  const dateNow = formatISODateString(new Date())
   formData.value.actionDate.defaultValue = dateNow
   formData.value.recordingDate.defaultValue = dateNow
-  formData.value.recordingDate.value = dateNow
+  formData.value.actionDate.value = dateNow
   formData.value.recordingDate.value = dateNow
 
   const responseResourceBudget = await resourceBudgetApi.getAll()
   if (responseResourceBudget) {
     listResourceBudget.value = responseResourceBudget
   }
+  if (!props.idRecording) {
+    const responseNewCode = await recordingApi.getNewCode()
+    if (responseNewCode) {
+      // console.log(responseNewCode)
+      formData.value.recordingCode.value = responseNewCode
+      formData.value.recordingCode.defaultValue = responseNewCode
+    }
+  } else {
+    const responseRecording = await recordingApi.getById(props.idRecording)
+    if (responseRecording) {
+      // console.log(responseRecording)
+      formData.value.recordingCode.value = responseRecording.recordingCode
+      formData.value.recordingCode.defaultValue = responseRecording.recordingCode
 
-  const responseNewCode = await recordingApi.getNewCode()
-  if (responseNewCode) {
-    console.log(responseNewCode)
-    formData.value.recordingCode.value = responseNewCode
-    formData.value.recordingCode.defaultValue = responseNewCode
+      formData.value.recordingDate.value = responseRecording.recordingDate
+      formData.value.recordingDate.defaultValue = responseRecording.recordingDate
+
+      formData.value.actionDate.value = responseRecording.actionDate
+      formData.value.actionDate.defaultValue = responseRecording.actionDate
+
+      formData.value.description.value = responseRecording.description
+      formData.value.description.defaultValue = responseRecording.description
+
+      data.value = responseRecording.assets.map((item) => {
+        const hmkh = Math.round((item.value * item.depreciationRate) / 100)
+        return {
+          ...item,
+          hmkh,
+          remainingValue: item.value - hmkh,
+          isChange: false
+        }
+      })
+      listAssetsId.value = data.value.map((item) => item.recordedAssetCode)
+      reformatTable()
+    }
   }
+
+  window.addEventListener('keydown', onPressKey)
 })
 
-const dialogProps = ref({
-  open: false,
-  content: ''
+/**
+ * Các sự kiện khi press key
+ * Created by: NTLam (20/07/2023)
+ */
+onUnmounted(() => {
+  window.removeEventListener('keydown', onPressKey)
 })
 
+/**
+ * Sự kiện khi ấn phím
+ * Created by: NTLam (20/07/2023)
+ */
+const onPressKey = (event) => {
+  if (event.key === 'Escape') {
+    if (openEditAsset.value) {
+      onCloseEditForm()
+    } else if (open.value.formSelectIncreaseAsset) {
+      onToggleFormSelectIncreaseAsset()
+    } else if (open.value.dialog) {
+      open.value.dialog = false
+    } else if (checkHavingChange()) {
+      open.value.dialog = true
+    } else {
+      onClickCloseForm()
+    }
+  } else if (event.key === 's' && event.ctrlKey) {
+    event.preventDefault()
+    onSave()
+  }
+}
+
+/**
+ * Chức năng: Đóng dialog
+ * Created by: NTLam (20/07/2023)
+ */
 const closeDialog = () => {
   dialogProps.value.open = false
   dialogProps.value.content = ''
 }
 
+/**
+ * Chức năng: Đóng form
+ * Created by: NTLam (20/07/2023)
+ */
 const onClickCloseForm = () => {
   emits('close-form')
 }
 
+/**
+ * Chức năng: Ẩn button đóng form
+ * Created by: NTLam (20/07/2023)
+ */
 const onKeydownBtnClose = (event) => {
   if (event.key === 'Enter') {
     emits('close-form')
   }
 }
 
+/**
+ * Chức năng: Đóng form edit
+ * Created by: NTLam (20/07/2023)
+ */
 const onCloseEditForm = () => {
   assetSelected.value = null
   openEditAsset.value = false
 }
 
+/**
+ * Chức năng: Mở form chọn tài sản
+ * Created by: NTLam (20/07/2023)
+ */
 const onToggleFormSelectIncreaseAsset = () => {
   open.value.formSelectIncreaseAsset = !open.value.formSelectIncreaseAsset
 }
 
+/**
+ * Chức năng: Mở form edit tài sản
+ * Created by: NTLam (20/07/2023)
+ */
 const onOpenEditAsset = (code) => {
-  const index = data.value.findIndex((item) => item.fixedAssetCode === code)
+  const index = data.value.findIndex((item) => item.recordedAssetCode === code)
   assetSelected.value = data.value[index]
   openEditAsset.value = true
 }
 
+/**
+ * Chức năng: Định dạng lại bảng
+ * Created by: NTLam (20/07/2023)
+ */
 const reformatTable = () => {
   pageData.value.currentPage = 1
   pageData.value.totalRecord = data.value.length
@@ -230,44 +489,80 @@ const reformatTable = () => {
   console.log(heightBalance.value)
 }
 
+/**
+ * Chức năng: Cập nhật tài sản
+ * Created by: NTLam (20/07/2023)
+ */
 const updateAsseet = (value) => {
-  const listIds = data.value.map((item) => item.fixedAssetCode)
+  const listIds = data.value.map((item) => item.recordedAssetCode)
   value.forEach((item) => {
     if (!listIds.includes(item.fixedAssetCode)) {
+      const hmkh = Math.round((item.cost * item.depreciationRate) / 100)
       data.value.push({
-        ...item,
-        resourceAssets: []
+        recordedAssetCode: item.fixedAssetCode,
+        recordedAssetName: item.fixedAssetName,
+        departmentName: item.departmentName,
+        value: item.cost,
+        depreciationRate: item.depreciationRate,
+        hmkh,
+        remainingValue: item.cost - hmkh,
+        recordingType: 1,
+        resourceAssets: [],
+        isChange: true
       })
     }
   })
   reformatTable()
-  listAssetsId.value = data.value.map((item) => item.fixedAssetCode)
+  listAssetsId.value = data.value.map((item) => item.recordedAssetCode)
   onToggleFormSelectIncreaseAsset()
 }
 
+/**
+ * Chức năng: Xóa tài sản
+ * Created by: NTLam (20/07/2023)
+ */
 const deleteAsset = (code) => {
-  const index = data.value.findIndex((item) => item.fixedAssetCode === code)
+  const index = data.value.findIndex((item) => item.recordedAssetCode === code)
+  if (data.value[index].recordedAssetId) {
+    listAssetIdDeletes.value.push(data.value[index].recordedAssetId)
+  }
   data.value.splice(index, 1)
-  listAssetsId.value = data.value.map((item) => item.fixedAssetCode)
+  listAssetsId.value = data.value.map((item) => item.recordedAssetCode)
+  reformatTable()
 }
-const onUpdateResourceAsset = (code, value) => {
-  const index = data.value.findIndex((item) => item.fixedAssetCode === code)
-  const dataUpdate = data.value[index]
-  dataUpdate.resourceAssets = value
-  const cost = value.reduce((sum, item) => sum + item.cost, 0)
-  dataUpdate.cost = cost
-  dataUpdate.hmkh = Math.round((cost * dataUpdate.depreciationRate) / 100)
-  dataUpdate.remainingValue = cost - dataUpdate.hmkh
 
+/**
+ * Chức năng: Cập nhật tài sản
+ * Created by: NTLam (20/07/2023)
+ */
+const onUpdateResourceAsset = (code, value) => {
+  const index = data.value.findIndex((item) => item.recordedAssetCode === code)
+  const dataUpdate = data.value[index]
+  if (value.length === 0) {
+    dataUpdate.resourceAssets = []
+  } else {
+    dataUpdate.resourceAssets = value
+    const cost = value.reduce((sum, item) => sum + item.cost, 0)
+    dataUpdate.value = cost
+    dataUpdate.hmkh = Math.round((cost * dataUpdate.depreciationRate) / 100)
+    dataUpdate.remainingValue = cost - dataUpdate.hmkh
+  }
+  dataUpdate.isChange = true
   onCloseEditForm()
 }
 
+/**
+ * Chức năng: Cập nhật dữ liệu form
+ * Created by: NTLam (20/07/2023)
+ */
 const onUpdateField = (field, value) => {
   formData.value[field].value = value
 }
 
-const loading = ref(false)
-
+/**
+ * Chức năng: Validate dữ liệu
+ * Created by: NTLam (20/07/2023)
+ */
 const onValidateData = () => {
   let isValid = true
   if (formData.value.recordingCode.value === '') {
@@ -275,39 +570,89 @@ const onValidateData = () => {
     formData.value.recordingCode.errorMessage = 'Mã chứng từ không được để trống'
     isValid = false
   }
-  if (formData.value.recordingDate.value === '') {
+  if (!formData.value.recordingDate.value) {
     formData.value.recordingDate.isValid = false
     formData.value.recordingDate.errorMessage = 'Ngày bắt đầu sử dụng không được để trống'
     isValid = false
+  } else {
+    const timestampDate = new Date(formData.value.recordingDate.value).getTime()
+    const timestampNow = new Date().getTime()
+    if (timestampDate > timestampNow) {
+      formData.value.recordingDate.isValid = false
+      formData.value.recordingDate.errorMessage = 'Ngày không được lớn hơn ngày hiện tại'
+      isValid = false
+    }
   }
-  if (formData.value.actionDate.value === '') {
+  if (!formData.value.actionDate.value) {
     formData.value.actionDate.isValid = false
     formData.value.actionDate.errorMessage = 'Ngày ghi tăng không được để trống'
     isValid = false
+  } else {
+    const timestampDate = new Date(formData.value.actionDate.value).getTime()
+    const timestampNow = new Date().getTime()
+    if (timestampDate > timestampNow) {
+      formData.value.actionDate.isValid = false
+      formData.value.actionDate.errorMessage = 'Ngày không được lớn hơn ngày hiện tại'
+      isValid = false
+    }
   }
   if (data.value.length === 0) {
-    dialogProps.value.open = true
-    dialogProps.value.content = 'Chọn ít nhất một tài sản'
     isValid = false
+    dialogProps.value.content = 'Chọn ít nhất một tài sản'
+    dialogProps.value.open = true
+    return false
   }
   return isValid
 }
 
+/**
+ * Chức năng: Kiểm tra dữ liệu có thay đổi
+ * Created by: NTLam (20/07/2023)
+ */
+const checkHavingChange = () => {
+  console.log(formData.value)
+  let isChange =
+    formData.value.recordingCode.value !== formData.value.recordingCode.defaultValue ||
+    formData.value.recordingDate.value != formData.value.recordingDate.defaultValue ||
+    formData.value.actionDate.value != formData.value.actionDate.defaultValue ||
+    formData.value.description.value !== formData.value.description.defaultValue
+  data.value.forEach((item) => {
+    if (item.isChange) {
+      isChange = true
+    }
+  })
+  return isChange
+}
+
+/**
+ * Chức năng: Lưu dữ liệu
+ * Created by: NTLam (20/07/2023)
+ */
 const onSave = async () => {
+  if (!checkHavingChange()) {
+    dialogProps.value.content = 'Chưa thay đổi dữ liệu.'
+    dialogProps.value.open = true
+    return
+  }
   let isValid = onValidateData()
-  if (isValid) {
+  if (isValid && !props.idRecording) {
+    console.log(data.value)
     loading.value = true
     const dataForm = {
       recording: {
         recordingCode: formData.value.recordingCode.value,
-        recordingDate: formData.value.recordingDate.value,
-        actionDate: formData.value.actionDate.value,
+        recordingDate: new Date(formData.value.recordingDate.value),
+        actionDate: new Date(formData.value.actionDate.value),
         description: formData.value.description.value
       },
       assets: data.value.map((item) => {
         return {
-          recordedAssetCode: item.fixedAssetCode,
-          resourceAssets: item.resourceAssets
+          recordedAssetCode: item.recordedAssetCode,
+          value: item.value,
+          resourceAssets: item.resourceAssets.map((item) => ({
+            resourceBudgetId: item.resourceBudget.resourceBudgetId,
+            cost: item.cost
+          }))
         }
       })
     }
@@ -318,12 +663,51 @@ const onSave = async () => {
     if (response) {
       emits('create-recording')
     }
+  } else if (isValid && props.idRecording) {
+    console.group('Update')
+    console.log(data)
+    const dataForm = {
+      recordingCode: formData.value.recordingCode.value,
+      recordingDate: formData.value.recordingDate.value,
+      actionDate: formData.value.actionDate.value,
+      description: formData.value.description.value,
+      value: sumData.value.cost,
+      assets: [
+        ...data.value
+          .filter((item) => item.isChange)
+          .map((item) => {
+            return {
+              recordedAssetId: item.recordedAssetId || null,
+              recordedAssetCode: item.recordedAssetCode,
+              value: item.value,
+              resourceAssets: item.resourceAssets.map((item) => ({
+                resourceBudget: item.resourceBudget,
+                cost: item.cost,
+                resourceAssetId: item.resourceAssetId
+              }))
+            }
+          }),
+        ...listAssetIdDeletes.value.map((item) => ({
+          recordedAssetId: item,
+          recordedAssetCode: null
+        }))
+      ]
+    }
+    console.log(JSON.stringify(dataForm))
+    console.groupEnd()
+    loading.value = true
+    const res = await recordingApi.update(props.idRecording, dataForm).finally(() => {
+      loading.value = false
+    })
+    if (res) {
+      emits('update-recording')
+    }
   }
 }
 </script>
 <template>
-  <MISABackdrop zIndex="100">
-    <MISABackdrop zIndex="101" v-if="loading" type="fullscreen">
+  <div class="dialog-form">
+    <MISABackdrop zIndex="1001" v-if="loading" type="fullscreen">
       <MISALoading />
     </MISABackdrop>
     <MISADialog
@@ -339,17 +723,17 @@ const onSave = async () => {
       @on-save="onUpdateResourceAsset"
       :resourceBudget="listResourceBudget"
       :assetSelected="assetSelected"
+      nameCode="recordedAssetCode"
     />
     <FormSelectIncreaseAsset
       v-if="open.formSelectIncreaseAsset"
       @close-select-asset="onToggleFormSelectIncreaseAsset"
-      :columnFields="tableFields"
       :listIds="listAssetsId"
       @select-asset="updateAsseet"
     />
-    <div class="form-recording">
-      <div class="form-header">
-        <h2>Thêm chứng từ ghi tăng</h2>
+    <div ref="dialogRef" class="form-recording">
+      <div ref="headRef" class="form-header">
+        <h2>{{ props.idRecording ? 'Sửa' : 'Thêm' }} chứng từ ghi tăng</h2>
         <button
           class="btn-close"
           ref="closeBtn"
@@ -394,7 +778,11 @@ const onSave = async () => {
               />
             </div>
             <div class="input-container__grid3">
-              <MISATextfield label="Ghi chú" @on-change="(v) => onUpdateField('description', v)" />
+              <MISATextfield
+                :defaultValue="formData.description.defaultValue"
+                label="Ghi chú"
+                @on-change="(v) => onUpdateField('description', v)"
+              />
             </div>
           </div>
         </div>
@@ -430,14 +818,14 @@ const onSave = async () => {
                           <MISAButton
                             width="32px"
                             height="32px"
-                            @click="() => onOpenEditAsset(data.fixedAssetCode)"
+                            @click="() => onOpenEditAsset(data.recordedAssetCode)"
                             type="icon"
                             ><i class="icon-pencil"></i
                           ></MISAButton>
                           <MISAButton
                             width="32px"
                             height="32px"
-                            @click="() => deleteAsset(data.fixedAssetCode)"
+                            @click="() => deleteAsset(data.recordedAssetCode)"
                             type="icon"
                             ><i class="icon-delete-red"></i
                           ></MISAButton>
@@ -479,11 +867,25 @@ const onSave = async () => {
         <MISAButton @click="onClickCloseForm" type="sub" padding>Hủy</MISAButton>
       </div>
     </div>
-  </MISABackdrop>
+  </div>
 </template>
 <style scoped>
+.dialog-form {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  /* background-color: rgba(0, 0, 0, 0.5); */
+  z-index: var(--z-index-form);
+  /* display: flex;
+  align-items: center;
+  justify-content: center; */
+  background-color: rgba(0, 0, 0, 0.5);
+}
 .form-recording {
   width: 70%;
+  position: relative;
 }
 .form-header {
   display: flex;
@@ -492,6 +894,7 @@ const onSave = async () => {
   padding: 16px;
   background-color: #fff;
   border-radius: 4px 4px 0 0;
+  cursor: move;
 }
 .div_form {
   background-color: #f4f7ff;

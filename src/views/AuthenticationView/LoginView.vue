@@ -8,7 +8,7 @@
       <img class="logo-misa" src="/src/assets/image/logo.svg" alt="Logo" />
       <div class="logo-text">Đăng nhập để làm việc với <span class="medium">MISA QLTS</span></div>
       <div class="show-popup_login"></div>
-      <div class="input-container">
+      <div class="input-container" @keyup.enter="onSubmit">
         <!-- <MISACombobox size="large" zIndex="3" :options="[1, 2, 3, 4]" />
         <MISACombobox size="large" :options="[1, 2, 3, 4]" /> -->
         <MISATextfield

@@ -34,7 +34,7 @@
           <div class="table">
             <table>
               <MISATableHeader
-                :columns="props.columnFields"
+                :columns="tableFields"
                 hasCheckbox
                 :action="false"
                 :selected-all="pageData.selectAll"
@@ -46,7 +46,7 @@
                 @double-click="onClickARow"
                 @shift-click="onPressShiftAndClick"
                 @select-row="toggleSelectRowByCheckbox"
-                :columnFields="props.columnFields"
+                :columnFields="tableFields"
                 @click-focusing="onClickARow"
                 :data="data"
               />
@@ -77,7 +77,7 @@
         </div>
         <div class="form-footer">
           <MISAButton @click="onClickSave" padding>Lưu</MISAButton>
-          <MISAButton type="sub" padding>Hủy</MISAButton>
+          <MISAButton @click="onClickCloseForm" type="sub" padding>Hủy</MISAButton>
         </div>
       </div>
     </MISABackdrop>
@@ -88,17 +88,80 @@
 import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { types } from '@/assets/resources/common'
 import fixedAssetApi from '@/service/api/fixedAssetApi'
+import { labelAsset, fieldList } from '@/assets/resources/asset'
+import { tooltip } from '@/assets/resources/common'
+import { useStore } from 'vuex'
 
 const props = defineProps({
-  columnFields: {
-    type: Array,
-    default: () => []
-  },
   listIds: {
     type: Array,
     default: () => []
   }
 })
+
+/**
+ * The store object.
+ * @type {import('vuex').Store}
+ * Creatd by: NTLam (15/8/2023)
+ */
+const store = useStore()
+
+/**
+ * The current language of the application.
+ * @type {import('vue').ComputedRef<string>}
+ * Creatd by: NTLam (15/8/2023)
+ */
+const lang = computed(() => store.state.lang)
+const tableFields = [
+  {
+    id: 0,
+    field: 'order',
+    label: 'STT',
+    type: 'order',
+    position: 'center'
+  },
+  {
+    id: 1,
+    field: fieldList.FIXED_ASSET_CODE,
+    label: labelAsset[lang.value].FIXED_ASSET_CODE,
+    type: 'string',
+    canSort: true
+  },
+  {
+    id: 2,
+    field: fieldList.FIXED_ASSET_NAME,
+    label: labelAsset[lang.value].FIXED_ASSET_NAME,
+    type: 'string'
+  },
+  {
+    id: 4,
+    field: fieldList.DEPARTMENT_NAME,
+    label: labelAsset[lang.value].DEPARTMENT_NAME,
+    type: 'string'
+  },
+  {
+    id: 6,
+    field: fieldList.COST,
+    label: labelAsset[lang.value].COST,
+    type: 'number',
+    position: 'right'
+  },
+  {
+    id: 7,
+    field: fieldList.HMKH,
+    label: 'Hao mòn năm',
+    type: 'number',
+    tooltip: tooltip[lang.value].HMKH,
+    position: 'right'
+  },
+  {
+    id: 8,
+    field: fieldList.REMAINING_VALUE,
+    label: labelAsset[lang.value].REMAINING_VALUE,
+    type: 'number',
+    position: 'right'
+  }
+]
 
 const emits = defineEmits(['close-select-asset', 'select-asset'])
 
@@ -173,7 +236,12 @@ onMounted(async () => {
 const onClickSave = () => {
   console.log('Click Save')
   console.log(listData.value)
-  emits('select-asset', listData.value)
+  if (listData.value.length > 0) {
+    emits('select-asset', listData.value)
+  } else {
+    dialogProps.value.content = 'Chọn ít nhất 1 tài sản'
+    dialogProps.value.open = true
+  }
 }
 
 watch(
@@ -243,10 +311,18 @@ const pagingList = computed(() => {
   return list
 })
 
+/**
+ * Chức năng: Đóng form chọn tài sản
+ * Created by: NTLam (20/07/2023)
+ */
 const onClickCloseForm = () => {
   emits('close-select-asset')
 }
 
+/**
+ * Chức năng: Đóng form chọn tài sản
+ * Created by: NTLam (20/07/2023)
+ */
 const onKeydownBtnClose = (event) => {
   if (event.key === 'Enter') {
     emits('close-select-asset')
@@ -269,14 +345,28 @@ const increaseOrDecreasePage = (type) => {
   }
 }
 
+/**
+ * Chức năng: Thay đổi số trang hiện tại
+ * Tác giả: Nguyễn Thanh Lâm
+ * Ngày tạo: 1/8/2023
+ */
 const changePage = (page) => {
   pageData.value.currentPage = page
 }
 
+/**
+ * Chức năng: Thay đổi số bản ghi trên 1 trang
+ * Tác giả: Nguyễn Thanh Lâm
+ * Ngày tạo: 1/8/2023
+ */
 const changeRecordPerpage = (size) => {
   pageData.value.pageSize = size
 }
 
+/**
+ * Chức năng: Thêm 1 tài sản vào danh sách
+ * Created by: NTLam (20/07/2023)
+ */
 const addAData = (code) => {
   const index = data.value.findIndex((item) => item.fixedAssetCode === code)
   const indexId = listData.value.findIndex((item) => item.fixedAssetCode === code)
@@ -286,6 +376,10 @@ const addAData = (code) => {
   }
 }
 
+/**
+ * Chức năng: Xóa 1 tài sản khỏi danh sách
+ * Created by: NTLam (20/07/2023)
+ */
 const removeData = (code) => {
   const index = data.value.findIndex((item) => item.fixedAssetCode === code)
   const indexId = listData.value.findIndex((item) => item.fixedAssetCode === code)
@@ -295,6 +389,10 @@ const removeData = (code) => {
   }
 }
 
+/**
+ * Chức năng: Chọn tất cả các tài sản
+ * Created by: NTLam (20/07/2023)
+ */
 const toggleSelectAll = () => {
   console.log('Click Select All')
   pageData.value.selectAll = !pageData.value.selectAll
@@ -309,6 +407,10 @@ const toggleSelectAll = () => {
   }
 }
 
+/**
+ * Chức năng: Chọn 1 tài sản
+ * Created by: NTLam (20/07/2023)
+ */
 const toggleSelectRowByCheckbox = (id) => {
   console.log('Click Checkbox')
   const index = data.value.findIndex((item) => item.fixedAssetId === id)
@@ -324,6 +426,10 @@ const toggleSelectRowByCheckbox = (id) => {
   }
 }
 
+/**
+ * Chức năng: Chọn 1 tài sản
+ * Created by: NTLam (20/07/2023)
+ */
 const onClickARow = (id) => {
   console.log('Click Focusing')
   const index = data.value.findIndex((item) => item.fixedAssetId === id)
@@ -339,6 +445,11 @@ const onClickARow = (id) => {
   checkSelectAll()
 }
 
+/**
+ * Event shift click.
+ * @param {string} id The id of asset.
+ * Created by: NTLam (15/8/2023)
+ */
 const onPressShiftAndClick = (id) => {
   console.log('Click Shift Click')
   const index = data.value.findIndex((item) => item.fixedAssetId === id)

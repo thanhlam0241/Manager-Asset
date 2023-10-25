@@ -31,6 +31,9 @@ class RecordingApi {
         }
         return axios.get(`${recordingRoute}/filter?${filterQuery.length > 0 ? filterQuery.join('&') : ''}`)
     }
+    getById(id) {
+        return axios.get(`${recordingAssetRoute}/${id}`);
+    }
     getNewCode() {
         return axios.get(`${recordingRoute}/new-code`);
     }
@@ -38,7 +41,7 @@ class RecordingApi {
         return axios.post(`${recordingAssetRoute}`, data);
     }
     update(id, data) {
-        return axios.put(`${recordingRoute}/${id}`, data);
+        return axios.put(`${recordingAssetRoute}/${id}`, data);
     }
     delete(id) {
         return axios.delete(`${recordingRoute}/${id}`);

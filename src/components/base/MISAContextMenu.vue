@@ -102,7 +102,7 @@ export default {
           menu.style.left = event.pageX + 'px'
         }
         console.log(menuHeight)
-        if (menuHeight + event.pageY >= window.innerHeight - 80) {
+        if (2 * menuHeight + event.pageY >= window.innerHeight) {
           menu.style.top = event.pageY - menuHeight + 'px'
         } else {
           menu.style.top = event.pageY + 'px'

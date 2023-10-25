@@ -10,9 +10,9 @@ import MISASearchBoxVue from '../components/base/MISASearchBox.vue'
 import MISAInput from '../components/base/MISAInput.vue'
 import MISASkeleton from '../components/base/MISASkeleton.vue'
 import MISALoading from '../components/base/MISALoading.vue'
-import sendPostRequest from '@/service/api/testData'
+//import sendPostRequest from '@/service/api/testData'
 
-sendPostRequest(100)
+//sendPostRequest(100)
 </script>
 
 <template>

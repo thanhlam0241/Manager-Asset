@@ -34,7 +34,7 @@ const props = defineProps({
  * @type {import('vue').EmitsOptions}
  * Created by: NTLam (20/07/2023)
  */
-const emit = defineEmits(['onChange'])
+const emit = defineEmits(['onChange', 'pressEnter'])
 
 /**
  * A reactive variable that represents the value state of the searchbox.
@@ -58,15 +58,29 @@ defineExpose({
 watch(
   inputValue,
   useDebounce((newValue) => {
-    emit('onChange', newValue)
+    if (newValue) {
+      emit('onChange', newValue)
+    } else {
+      emit('pressEnter', '')
+    }
   }, 500)
 )
+
+const onEnter = () => {
+  emit('pressEnter', inputValue.value)
+}
 </script>
 
 <template>
   <div :style="{ ...props.style }" :class="['searchbox', { disabled: disabled }]">
     <button class="btn-find"><i class="icon-find"></i></button>
-    <input v-model="inputValue" class="searchbox__input" type="text" :placeholder="placeholder" />
+    <input
+      @keydown.enter="onEnter"
+      v-model="inputValue"
+      class="searchbox__input"
+      type="text"
+      :placeholder="placeholder"
+    />
   </div>
 </template>
 

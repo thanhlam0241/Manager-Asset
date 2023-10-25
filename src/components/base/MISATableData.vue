@@ -40,6 +40,14 @@ const props = defineProps({
   borderBottom: {
     type: Boolean,
     default: true
+  },
+  style: {
+    type: Object,
+    default: () => ({})
+  },
+  color: {
+    type: String,
+    default: ''
   }
 })
 
@@ -63,6 +71,14 @@ const typeClass = computed(() => {
     return 'text'
   }
 })
+
+const color = computed(() => {
+  if (props.color) {
+    return props.color
+  } else {
+    return 'auto'
+  }
+})
 </script>
 
 <template>
@@ -70,6 +86,7 @@ const typeClass = computed(() => {
     v-if="props.action"
     :width="props.width"
     height="40"
+    :style="{ ...props.style, color: color }"
     :class="[
       typeClass,
       { data__number: props.type === 'number' },
@@ -92,6 +109,7 @@ const typeClass = computed(() => {
     v-else
     :width="props.width"
     height="40"
+    :style="{ ...props.style, color: color }"
     :class="[
       typeClass,
       { data__number: props.type === 'number' },

@@ -25,7 +25,7 @@ onMounted(() => {
 
   authenticateApi.checkLogin().then(
     (response) => {
-      console.log(response)
+      // console.log(response)
       //router.push('/')
     },
     (error) => {
@@ -54,7 +54,7 @@ const addToastMessage = ({ type, message }) => {
   })
   setTimeout(() => {
     toastMessages.value.shift()
-  }, 10000)
+  }, 5000)
 }
 
 /**

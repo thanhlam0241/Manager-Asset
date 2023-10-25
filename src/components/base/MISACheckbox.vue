@@ -53,10 +53,10 @@ const refCheckbox = ref(null)
 watch(
   () => props.value,
   (newValue) => {
-    console.group('watch change checkbox')
+    // console.group('watch change checkbox')
     checked.value = newValue
-    console.log(newValue)
-    console.groupEnd()
+    // console.log(newValue)
+    // console.groupEnd()
   }
 )
 

@@ -9,6 +9,10 @@ import { useStore } from 'vuex'
 import { types } from '@/assets/resources/common'
 import router from '@/router'
 
+/**
+ * The props object.
+ * Creatd by: NTLam (15/8/2023)
+ */
 const props = defineProps({
   tableFields: {
     type: Array,
@@ -47,6 +51,12 @@ const props = defineProps({
     default: ''
   }
 })
+
+/**
+ * The table fields.
+ * @type {Ref<Array>}
+ * Creatd by: NTLam (15/8/2023)
+ */
 const emits = defineEmits([
   'selectRow',
   'selectCheckboxRow',
@@ -55,7 +65,8 @@ const emits = defineEmits([
   'ctrlClick',
   'shiftClick',
   'onToggleAll',
-  'showDetail'
+  'showDetail',
+  'doubleClick'
 ])
 /**
  * The store object.
@@ -64,8 +75,18 @@ const emits = defineEmits([
  */
 const store = useStore()
 
+/**
+ * The language.
+ * @type {string}
+ * Creatd by: NTLam (15/8/2023)
+ */
 const lang = store.state.lang
 
+/**
+ * The table body reference.
+ * @type {Ref<Object>}
+ * Creatd by: NTLam (15/8/2023)
+ */
 const tBodyRef = ref(null)
 
 /**
@@ -115,7 +136,22 @@ const items = ref([
  */
 const selectedAssetId = ref('')
 
+/**
+ * The loading state.
+ * @type {Ref<boolean>}
+ * Creatd by: NTLam (15/8/2023)
+ */
 const loading = ref(false)
+
+/**
+ * The dialog props.
+ * @type {Ref<Object>}
+ * Creatd by: NTLam (15/8/2023)
+ */
+const dialogProps = ref({
+  open: false,
+  content: ''
+})
 
 /**
  * Shows the context menu with the given event and items.
@@ -138,12 +174,18 @@ onUnmounted(() => {
 const hideContextMenu = () => {
   mymenu.value.hide()
 }
+
+/**
+ * Watches the currentPage prop and scrolls the table body to the top when the currentPage changes.
+ * Creatd by: NTLam (15/8/2023)
+ */
 watch(
   () => props.currentPage,
   () => {
     tBodyRef.value.scrollTop = 0
   }
 )
+
 /**
  * Function that handles right-click event on a row in the MISATable component.
  * @param {Event} event - The right-click event.
@@ -155,11 +197,10 @@ const rightClickARow = (event, id) => {
   showContextMenu(event)
 }
 
-const dialogProps = ref({
-  open: false,
-  content: ''
-})
-
+/**
+ * Function that handles the delete event.
+ * Creatd by: NTLam (15/8/2023)
+ */
 const deleteARecording = async () => {
   closeDialog()
   if (selectedAssetId.value) {
@@ -174,11 +215,19 @@ const deleteARecording = async () => {
   }
 }
 
+/**
+ * Function that handles the close event.
+ * Creatd by: NTLam (15/8/2023)
+ */
 const closeDialog = () => {
   dialogProps.value.open = false
   dialogProps.value.content = ''
 }
 
+/**
+ * Function that handles the delete event.
+ * Creatd by: NTLam (15/8/2023)
+ */
 const showDialogDelete = (type, id) => {
   if (id) {
     selectedAssetId.value = id
@@ -220,12 +269,12 @@ const pagingList = computed(() => {
   } else {
     if (props.page <= 4) {
       list.push(1, 2, 3, 4, 5, '...', numberPage)
-    } else if (props.page >= numberPage - 4) {
+    } else if (props.currentPage >= numberPage - 4) {
       list.push(1, '...', numberPage - 4, numberPage - 3, numberPage - 2)
       list.push(numberPage - 1, numberPage)
     } else {
       list.push(1, '...')
-      list.push(props.page - 1, props.page, props.page + 1)
+      list.push(props.currentPage - 1, props.currentPage, props.currentPage + 1)
       list.push('...', numberPage)
     }
   }
@@ -244,10 +293,18 @@ const listPages = computed(() => {
   return list
 })
 
+/**
+ * Tính tổng số tiền
+ * Creatd by: NTLam (15/8/2023)
+ */
 const sumCost = computed(() => {
   return props.data.reduce((sum, data) => sum + data.value, 0)
 })
 
+/**
+ * Chức năng: Xử lý sự kiện click vào 1 hàng trong bảng
+ * Created by: NTLam (15/8/2023)
+ */
 const onMousedownRow = (event, id) => {
   if (event.ctrlKey) {
     event.preventDefault()
@@ -285,13 +342,14 @@ const changePage = (page) => {
  * Ngày tạo: 1/8/2023
  */
 const increaseOrDecreasePage = (type) => {
+  console.log('click')
   if (type === types.INCREASE) {
-    if (props.page < props.numberOfPage) {
-      router.replace({ query: { ...router.currentRoute.value.query, page: props.page + 1 } })
+    if (props.currentPage < props.numberOfPage) {
+      router.replace({ query: { ...router.currentRoute.value.query, page: props.currentPage + 1 } })
     }
   } else {
-    if (props.page > 1) {
-      router.replace({ query: { ...router.currentRoute.value.query, page: props.page - 1 } })
+    if (props.currentPage > 1) {
+      router.replace({ query: { ...router.currentRoute.value.query, page: props.currentPage - 1 } })
     }
   }
 }
@@ -318,17 +376,19 @@ const changeRecordPerpage = (value) => {
       @agree-dialog="deleteARecording"
       @close-dialog="closeDialog"
     />
-    <MISAContextMenu
-      ref="mymenu"
-      minWidth="1em"
-      maxWidth="15em"
-      backgroundColor="#fbfbfb"
-      fontSize="15px"
-      textColor="#35495e"
-      iconColor="#41b883"
-      borderRadius="0.1em"
-      @mouseleave="onMouseLeaveContext"
-    />
+    <Teleport to="body">
+      <MISAContextMenu
+        ref="mymenu"
+        minWidth="1em"
+        maxWidth="15em"
+        backgroundColor="#fbfbfb"
+        fontSize="15px"
+        textColor="#35495e"
+        iconColor="#41b883"
+        borderRadius="0.1em"
+        @mouseleave="onMouseLeaveContext"
+      />
+    </Teleport>
     <table>
       <MISATableHeader
         :sticky="false"
@@ -345,6 +405,7 @@ const changeRecordPerpage = (value) => {
           :selected="data.isChecked"
           v-for="(data, index) in props.data"
           @mousedown.stop="(e) => onMousedownRow(e, data.recordingId)"
+          @dblclick="$emit('doubleClick', data.recordingId)"
           :key="'row' + index"
         >
           <MISATableData type="checkbox">
@@ -358,6 +419,7 @@ const changeRecordPerpage = (value) => {
             :key="'td' + index + column.recordingCode"
             :type="column.type"
             :position="column.position"
+            :color="column.color"
           >
             {{
               column.field == 'value'
@@ -368,6 +430,7 @@ const changeRecordPerpage = (value) => {
           <MISATableData width="50px" type="action">
             <MISAButton
               width="32px"
+              transparent
               height="32px"
               @click="$emit('changeRecord', data.recordingId)"
               type="icon"
@@ -375,6 +438,7 @@ const changeRecordPerpage = (value) => {
             ></MISAButton>
             <MISAButton
               width="32px"
+              transparent
               height="32px"
               @click="() => showDialogDelete('single', data.recordingId)"
               type="icon"
@@ -382,8 +446,10 @@ const changeRecordPerpage = (value) => {
             ></MISAButton>
           </MISATableData>
         </MISATableRow>
-        <tr v-if="props.heightTable > 0" :height="heightTable">
-          <td :height="props.heightTable" colspan="8"></td>
+        <tr v-if="props.heightTable > 0 || props.data.length == 0" :height="heightTable">
+          <td class="empty-td" :height="props.heightTable" colspan="8">
+            {{ props.data.length == 0 ? 'Không tìm thấy dữ liệu' : '' }}
+          </td>
         </tr>
       </tbody>
       <MISATableFooter
@@ -426,8 +492,14 @@ table {
   height: 100%;
   width: 100%;
   overflow: auto;
+  position: relative;
 }
 .not-scroll {
   overflow: hidden;
+}
+.empty-td {
+  text-align: center;
+  font-weight: 600;
+  font-size: 18px;
 }
 </style>

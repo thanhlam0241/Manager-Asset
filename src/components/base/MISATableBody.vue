@@ -57,6 +57,25 @@ const props = defineProps({
   }
 })
 
+/**
+ * Emit của table body
+ * @type {Object}
+ * @property {Function} selectRow - Chọn 1 dòng
+ * @property {Function} selectCheckboxRow - Chọn 1 dòng bằng checkbox
+ * @property {Function} changeRecord - Thay đổi 1 dòng
+ * @property {Function} deleteRecord - Xóa 1 dòng
+ * @property {Function} ctrlClick - Click với phím Ctrl
+ * @property {Function} doubleClick - Double click
+ * @property {Function} clickCtrl - Click với phím Ctrl
+ * @property {Function} shiftClick - Click với phím Shift
+ * @property {Function} clickFocusing - Click vào dòng đang focus
+ * @property {Function} contextMenu - Click chuột phải
+ * @property {Function} changeDialog - Thay đổi dialog
+ * @property {Function} duplicateDialog - Nhân bản dialog
+ * @property {Function} delete - Xóa
+ * @property {Function} change - Thay đổi
+ * Created by: NTLam (20/07/2023)
+ */
 const emits = defineEmits([
   'selectRow',
   'selectCheckboxRow',
@@ -74,6 +93,12 @@ const emits = defineEmits([
   'change'
 ])
 
+/**
+ * Xử lý sự kiện khi click vào 1 dòng
+ * @param {Event} e - Sự kiện click
+ * @param {String} id - Id của dòng
+ * Created by: NTLam (20/07/2023)
+ */
 const onMousedownRow = (e, id) => {
   if (e.shiftKey) {
     emits('shiftClick', id)
@@ -166,9 +191,10 @@ const onMousedownRow = (e, id) => {
         ></MISAButton>
       </MISATableData>
     </MISATableRow>
-    <!-- <MISATableRow height="40px" :key="`empty${i}`" v-for="i in props.emptyData"></MISATableRow> -->
-    <tr :height="props.heightBalance" v-if="heightBalance > 0">
-      <td :height="props.heightBalance" :colspan="props.columnFields.length + 1"></td>
+    <tr :height="props.heightBalance" v-if="props.data.length === 0 || heightBalance > 0">
+      <td class="empty-td" :height="props.heightBalance" :colspan="props.columnFields.length + 1">
+        {{ props.data.length == 0 ? 'Không tìm thấy dữ liệu' : '' }}
+      </td>
     </tr>
   </tbody>
 </template>
@@ -186,6 +212,11 @@ td.column__function {
   max-width: 100px;
   padding: 0 16px;
   text-align: center;
+}
+.empty-td {
+  text-align: center;
+  font-weight: 600;
+  font-size: 18px;
 }
 
 .div__function {

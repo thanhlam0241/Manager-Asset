@@ -106,7 +106,7 @@ const position = computed(() => {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
+  align-items: flex-end;
   gap: 10px;
   position: relative;
 }
